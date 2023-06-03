@@ -1,49 +1,55 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <title>Create Object</title>
 </head>
 <body>
-    <h1>Create Object</h1>
-    <form id="object-form" action="/create-document" method="post">
-
-        <label for="collection-select">Tabella</label><select name="table" id="collection-select" onchange="fetchFields()">
+<h1>Create Object</h1>
+<form action="/create-document" id="object-form" method="post">
+    <label for="collection-select">Tabella: </label>
+    {% if is_admin %}
+    <!--suppress XmlDuplicatedId -->
+    <input id="collection-select" name="table" type="text">
+    {% else %}
+    <!--suppress XmlDuplicatedId -->
+    <select id="collection-select" name="table" onchange="fetchFields()">
 
         {% for colle in col %}
-                <option value="{{colle}}">{{ colle }}</option>
-            {% endfor %}
+        <option value="{{colle}}">{{ colle }}</option>
+        {% endfor %}
+        {% endif %}
         <!-- Add more options for other collections -->
     </select>
 
-        <table id="fields-container"></table>
+    <table id="fields-container"></table>
 
-        <button id="add-field" type="button">Add Field</button>
+    <button id="add-field" type="button">Add Field</button>
         <br><br>
         <input type="submit" value="Create Object">
     </form>
 
     <script>
         function fetchFields() {
-            var selectedCollection = document.getElementById("collection-select").value;
+            const selectedCollection = document.getElementById("collection-select").value;
 
             // Clear fields container
             document.getElementById("fields-container").innerHTML = "";
 
             if (selectedCollection !== "") {
                 // Make AJAX request to fetch fields for selected collection
-                var xhr = new XMLHttpRequest();
+                const xhr = new XMLHttpRequest();
                 xhr.onreadystatechange = function() {
                     if (xhr.readyState === 4 && xhr.status === 200) {
-                        var fieldsContainer = document.getElementById("fields-container");
-                        var fields = JSON.parse(xhr.responseText);
+                        const fieldsContainer = document.getElementById("fields-container");
+                        const fields = JSON.parse(xhr.responseText);
 
-                        for (var i = 0; i < fields.length; i++) {
-                            var field = fields[i];
-                            var fieldDiv = document.createElement("tr");
+                        for (let i = 0; i < fields.length; i++) {
+                            const field = fields[i];
+                            const fieldDiv = document.createElement("tr");
                             fieldDiv.className = "field";
                             fieldDiv.innerHTML = '<td><label>Field name:</label></td>' +
                                 '<td><input type="text" name="field_name[]" value="' + field + '" readonly></td>' +
-                                 '<td><label>Field Value:</label></td>' +
+                                '<td><label>Field Value:</label></td>' +
                                 '<td><input type="text" name="field_value[]" required></td>' +
                                 '<td><button class="remove-field">Remove</button></td>';
                             fieldsContainer.appendChild(fieldDiv);
@@ -57,8 +63,8 @@
         fetchFields();
         // Add field on button click
         document.getElementById("add-field").addEventListener("click", function() {
-            var fieldsContainer = document.getElementById("fields-container");
-            var field = document.createElement("tr");
+            const fieldsContainer = document.getElementById("fields-container");
+            const field = document.createElement("tr");
             field.className = "field";
             field.innerHTML = '<td><label>Field Name:</label></td><td><input type="text" name="field_name[]" required> </td>' +
                 '<td><label>Field Value:</label></td><td><input type="text" name="field_value[]" required> </td>' +
@@ -69,7 +75,7 @@
         // Remove field on button click
         document.addEventListener("click", function(event) {
             if (event.target && event.target.classList.contains("remove-field")) {
-                var field = event.target.parentNode.parentNode;
+                const field = event.target.parentNode.parentNode;
                 field.parentNode.removeChild(field);
             }
         });
