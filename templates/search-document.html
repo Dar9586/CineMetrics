@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Object</title>
+</head>
+<body>
+    <h1>Create Object</h1>
+    <form id="object-form" action="/apply-search" method="get">
+        <input type="number" value="1" name="page" hidden="hidden" >
+        <label for="collection-select">Tabella</label><select name="table" id="collection-select" onchange="fetchFields()">
+
+        {% for colle in col %}
+                <option value="{{colle}}">{{ colle }}</option>
+            {% endfor %}
+        <!-- Add more options for other collections -->
+    </select>
+
+        <table id="fields-container"></table>
+
+        <button id="add-field" type="button">Add Field</button>
+        <br><br>
+        <input type="submit" value="Create Object">
+    </form>
+
+    <script>
+
+        function createSelectWithOptions(options) {
+            options.push("_id");
+            options.sort();
+  // Create the <select> element
+  var selectElement = document.createElement("select");
+    selectElement.name="field_name[]";
+  // Iterate over the options array and create <option> elements
+  for (var i = 0; i < options.length; i++) {
+    var option = document.createElement("option");
+    option.text = options[i];
+    option.value = options[i];
+    selectElement.appendChild(option);
+  }
+
+
+  // Return the generated <select> element
+  return selectElement;
+}
+  var genericSelect;
+
+        function fetchFields() {
+            var selectedCollection = document.getElementById("collection-select").value;
+
+            // Clear fields container
+            document.getElementById("fields-container").innerHTML = "";
+
+            if (selectedCollection !== "") {
+                // Make AJAX request to fetch fields for selected collection
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4 && xhr.status === 200) {
+                        var fieldsContainer = document.getElementById("fields-container");
+                        var fields = JSON.parse(xhr.responseText);
+
+                        genericSelect=createSelectWithOptions(fields);
+                        while (fieldsContainer.firstChild) {
+                            fieldsContainer.removeChild(fieldsContainer.firstChild);
+                        }
+                    }
+                };
+                xhr.open("GET", "/get-fields?collection=" + selectedCollection, true);
+                xhr.send();
+            }
+        }
+        fetchFields();
+        // Add field on button click
+        document.getElementById("add-field").addEventListener("click", function() {
+            var fieldsContainer = document.getElementById("fields-container");
+            var field = document.createElement("tr");
+            field.className = "field";
+            field.innerHTML = '<td><label>Field Name:</label></td><td>'+genericSelect.outerHTML+'</td>' +
+                '<td><select name="field_operation[]" required>\n' +
+                '        <option value="$eq">=</option>\n' +
+                '        <option value="$ne">&#8800;</option>\n' +
+                '        <option value="$gt">&gt;</option>\n' +
+                '        <option value="$gte">&#8805;</option>\n' +
+                '        <option value="$lt">&lt;</option>\n' +
+                '        <option value="$lte">&#8804;</option>\n' +
+                '        <option value="$in">&#8712;</option>\n' +
+                '        <option value="$nin">&#8713;</option>\n' +
+                '    </select></td>'+
+                '<td><label>Field Value:</label></td><td><input type="text" name="field_value[]" required> </td>' +
+                '<td><button class="remove-field">Remove</button></td>';
+            fieldsContainer.appendChild(field);
+        });
+
+        // Remove field on button click
+        document.addEventListener("click", function(event) {
+            if (event.target && event.target.classList.contains("remove-field")) {
+                var field = event.target.parentNode.parentNode;
+                field.parentNode.removeChild(field);
+            }
+        });
+    </script>
+</body>
+</html>

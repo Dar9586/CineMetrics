@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Object</title>
+</head>
+<body>
+    <h1>Create Object</h1>
+    <form id="object-form" action="/create-document-admin" method="post">
+
+        <label for="collection-select">Tabella</label><input type="text" name="table" id="collection-select">
+
+        <table id="fields-container"></table>
+
+        <button id="add-field" type="button">Add Field</button>
+        <br><br>
+        <input type="submit" value="Create Object">
+    </form>
+
+    <script>
+        // Add field on button click
+        document.getElementById("add-field").addEventListener("click", function() {
+            var fieldsContainer = document.getElementById("fields-container");
+            var field = document.createElement("tr");
+            field.className = "field";
+            field.innerHTML = '<td><label>Field Name:</label></td><td><input type="text" name="field_name[]" required> </td>' +
+                '<td><label>Field Value:</label></td><td><input type="text" name="field_value[]" required> </td>' +
+                '<td><button class="remove-field">Remove</button></td>';
+            fieldsContainer.appendChild(field);
+        });
+
+        // Remove field on button click
+        document.addEventListener("click", function(event) {
+            if (event.target && event.target.classList.contains("remove-field")) {
+                var field = event.target.parentNode.parentNode;
+                field.parentNode.removeChild(field);
+            }
+        });
+    </script>
+</body>
+</html>
