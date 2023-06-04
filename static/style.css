@@ -1,34 +1,64 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
 h1 {
     text-align: center;
     color: #333;
     font-size: 32px;
     margin-bottom: 20px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-    font-family: "Arial", sans-serif; /* Aggiungi questa riga e sostituisci con il font desiderato */
 }
 
-label {
-    font-weight: bold; /* Imposta il testo in grassetto */
-    color: #333; /* Imposta il colore del testo */
-    font-size: 16px; /* Imposta la dimensione del testo */
-    margin-right: 10px; /* Aggiunge uno spazio a destra tra la label e l'elemento di input/select */
+.items {
+    margin-bottom: 20px;
+}
+
+.item {
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 50px;
+    margin-bottom: 50px;
 }
 
 ul {
-    border: 3px solid #f541f5;
-    padding: 0;
     list-style: none;
+    padding: 0;
+    margin: 0;
 }
 
-table {
-    border-collapse: collapse;
-    width: 100%;
+li {
+    margin-bottom: 10px;
 }
 
-th, td {
-    padding: 8px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
+strong {
+    font-weight: bold;
+    color: #333;
+}
+
+button {
+
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border-radius: 9px;
+}
+
+button:hover {
+    background-color: #c0392b;
 }
 
 .pagination {
@@ -52,43 +82,6 @@ th, td {
 
 .current-page {
     font-weight: bold;
-}
-
-/* Effetti aggiunti */
-
-h1 {
-    text-align: center;
-    color: #333;
-    font-size: 32px;
-    margin-bottom: 20px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-ul {
-    background-color: #f9f9f9;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    border-radius: 4px;
-    margin-bottom: 20px;
-}
-
-ul li {
-    margin-bottom: 10px;
-}
-
-button {
-    background-color: #e74c3c;
-    color: #fff;
-    border: none;
-    padding: 8px 12px;
-    font-size: 14px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    border-radius: 4px;
-}
-
-button:hover {
-    background-color: #c0392b;
 }
 
 .loading-screen {

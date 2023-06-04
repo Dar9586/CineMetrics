@@ -2,49 +2,57 @@
 <html lang="en">
 <head>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <title>Collection Viewer</title>
-
 </head>
 <body>
-<h1>Collection Viewer</h1>
+<div class="container">
+    <h1>Collection Viewer</h1>
 
-<div>
-    {% for item in items %}
-    <ul>
-        {% for key, value in item.items() if key != "_id" %}
-        <li>
-            <strong>{{ key }}:</strong>
-            <span>{{ value }}</span>
-        </li>
+    <div class="items">
+        {% for item in items %}
+        <div class="item">
+            <ul>
+                {% for key, value in item.items() if key != "_id" %}
+                <li>
+                    <strong>{{ key }}:</strong>
+                    <span>{{ value }}</span>
+                </li>
+                {% endfor %}
+                <li>
+                    <button onclick="deleteDocument('{{ col_name }}', '{{ item['_id'] }}')">Delete Document</button>
+                </li>
+            </ul>
+        </div>
         {% endfor %}
-        <li>
-            <button onclick="deleteDocument('{{ col_name }}', '{{ item['_id'] }}')">Delete Document</button>
-        </li>
-    </ul>
-    {% endfor %}
+    </div>
+
+    <div class="pagination">
+        {% if current_page > 1 %}
+        <a href="{{ url_for('get_data', collection_name=col_name, page=1) }}">First</a>
+        <a href="{{ url_for('get_data', collection_name=col_name, page=current_page-1) }}">Previous</a>
+        {% endif %}
+
+        {% set start_page = current_page - 5 if current_page > 5 else 1 %}
+        {% set end_page = current_page + 5 if current_page + 5 <= total_page else total_page %}
+
+        {% for page_num in range(start_page, end_page+1) %}
+        {% if page_num == current_page %}
+        <span class="current-page">{{ page_num }}</span>
+        {% else %}
+        <a href="{{ url_for('get_data', collection_name=col_name, page=page_num) }}">{{ page_num }}</a>
+        {% endif %}
+        {% endfor %}
+
+        {% if current_page < total_page %}
+        <a href="{{ url_for('get_data', collection_name=col_name, page=current_page+1) }}">Next</a>
+        <a href="{{ url_for('get_data', collection_name=col_name, page=total_page) }}">Last</a>
+        {% endif %}
+    </div>
 </div>
 
-<div class="pagination">
-    {% if current_page > 1 %}
-    <a href="{{ url_for('get_data', collection_name=col_name, page=1) }}">First</a>
-    <a href="{{ url_for('get_data', collection_name=col_name, page=current_page-1) }}">Previous</a>
-    {% endif %}
-
-    {% set start_page = current_page - 5 if current_page > 5 else 1 %}
-    {% set end_page = current_page + 5 if current_page + 5 <= total_page else total_page %}
-
-    {% for page_num in range(start_page, end_page+1) %}
-    {% if page_num == current_page %}
-    <span class="current-page">{{ page_num }}</span>
-    {% else %}
-    <a href="{{ url_for('get_data', collection_name=col_name, page=page_num) }}">{{ page_num }}</a>
-    {% endif %}
-    {% endfor %}
-
-    {% if current_page < total_page %}
-    <a href="{{ url_for('get_data', collection_name=col_name, page=current_page+1) }}">Next</a>
-    <a href="{{ url_for('get_data', collection_name=col_name, page=total_page) }}">Last</a>
-    {% endif %}
+<div class="loading-screen">
+    <div class="loading-text">Loading...</div>
 </div>
 
 <script>
