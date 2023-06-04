@@ -1,0 +1,120 @@
+h1 {
+    text-align: center;
+    color: #333;
+    font-size: 32px;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    font-family: "Arial", sans-serif; /* Aggiungi questa riga e sostituisci con il font desiderato */
+}
+
+label {
+    font-weight: bold; /* Imposta il testo in grassetto */
+    color: #333; /* Imposta il colore del testo */
+    font-size: 16px; /* Imposta la dimensione del testo */
+    margin-right: 10px; /* Aggiunge uno spazio a destra tra la label e l'elemento di input/select */
+}
+
+ul {
+    border: 3px solid #f541f5;
+    padding: 0;
+    list-style: none;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.pagination {
+    margin-top: 10px;
+    text-align: center;
+}
+
+.pagination a {
+    display: inline-block;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    background-color: #f1f1f1;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.pagination a:hover {
+    background-color: #ddd;
+}
+
+.current-page {
+    font-weight: bold;
+}
+
+/* Effetti aggiunti */
+
+h1 {
+    text-align: center;
+    color: #333;
+    font-size: 32px;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+ul {
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+}
+
+ul li {
+    margin-bottom: 10px;
+}
+
+button {
+    background-color: #e74c3c;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    border-radius: 4px;
+}
+
+button:hover {
+    background-color: #c0392b;
+}
+
+.loading-screen {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f1f1f1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+
+.loading-text {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+/* Animazione per la schermata di caricamento */
+body.loading .loading-screen {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+}

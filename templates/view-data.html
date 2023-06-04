@@ -1,52 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
     <title>Collection Viewer</title>
-    <style>
-        ul {
-            border: 2px solid red;
-        }
 
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-
-        th, td {
-            padding: 8px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .pagination {
-            margin-top: 10px;
-        }
-
-        .pagination a {
-            padding: 8px 12px;
-            border: 1px solid #ddd;
-            background-color: #f1f1f1;
-            color: #333;
-            text-decoration: none;
-        }
-
-        .pagination a:hover {
-            background-color: #ddd;
-        }
-
-    </style>
 </head>
 <body>
 <h1>Collection Viewer</h1>
 
-<div border="1">
+<div>
     {% for item in items %}
     <ul>
         {% for key, value in item.items() if key != "_id" %}
-        <li>{{key}}: {{ value }}</li>
+        <li>
+            <strong>{{ key }}:</strong>
+            <span>{{ value }}</span>
+        </li>
         {% endfor %}
         <li>
-            <button onclick="deleteDocument('{{ col_name }}', '{{ item[" _id"] }}')">Delete Document</button>
+            <button onclick="deleteDocument('{{ col_name }}', '{{ item['_id'] }}')">Delete Document</button>
         </li>
     </ul>
     {% endfor %}
@@ -54,8 +26,8 @@
 
 <div class="pagination">
     {% if current_page > 1 %}
-    <a href="{{ url_for('get_data',collection_name=col_name, page=1) }}">First</a>
-    <a href="{{ url_for('get_data',collection_name=col_name, page=current_page-1) }}">Previous</a>
+    <a href="{{ url_for('get_data', collection_name=col_name, page=1) }}">First</a>
+    <a href="{{ url_for('get_data', collection_name=col_name, page=current_page-1) }}">Previous</a>
     {% endif %}
 
     {% set start_page = current_page - 5 if current_page > 5 else 1 %}
@@ -65,13 +37,13 @@
     {% if page_num == current_page %}
     <span class="current-page">{{ page_num }}</span>
     {% else %}
-    <a href="{{ url_for('get_data',collection_name=col_name, page=page_num) }}">{{ page_num }}</a>
+    <a href="{{ url_for('get_data', collection_name=col_name, page=page_num) }}">{{ page_num }}</a>
     {% endif %}
     {% endfor %}
 
     {% if current_page < total_page %}
-    <a href="{{ url_for('get_data',collection_name=col_name, page=current_page+1) }}">Next</a>
-    <a href="{{ url_for('get_data',collection_name=col_name, page=total_page) }}">Last</a>
+    <a href="{{ url_for('get_data', collection_name=col_name, page=current_page+1) }}">Next</a>
+    <a href="{{ url_for('get_data', collection_name=col_name, page=total_page) }}">Last</a>
     {% endif %}
 </div>
 
@@ -81,7 +53,7 @@
         fetch('/delete/' + collectionName + '/' + documentId, {method: 'POST'})
             .then(response => response.json())
             .then(data => {
-                console.log()
+                console.log(data);
                 // Display a success or failure message based on the response
                 if (data.deleted_count === 1) {
                     alert('Document deleted successfully.');
@@ -95,7 +67,6 @@
                 console.error('Error:', error);
             });
     }
-
 </script>
 </body>
 </html>

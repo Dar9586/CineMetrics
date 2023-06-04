@@ -1,0 +1,132 @@
+/* styles.css */
+body {
+    background-image: url('/static/48891.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 20px;
+}
+
+
+h1 {
+    color: #d4edf4;
+    font-size: 50px;
+
+}
+
+form {
+    margin-top: 20px;
+}
+
+label {
+    font-weight: bold;
+}
+
+#collection-select {
+    width: 200px;
+    padding: 5px;
+}
+
+input[type="text"] {
+    border: 1px solid #ffffff;
+    background: #6ac0fdb5;
+    border-radius: 8px;
+    padding: 8px;
+}
+#collection-select {
+    appearance: none;
+    background-color: #c9d8dbb5;
+    border: 1px solid #6ac0fd;
+    color: #fff;
+    padding: 10px;
+    font-size: 16px;
+    width: 200px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#collection-select:hover {
+    background-color: #e0e0e0;
+}
+
+#collection-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #aaa;
+}
+
+label {
+    font-weight: bold; /* Imposta il testo in grassetto */
+    color: #fff; /* Imposta il colore del testo */
+    font-size: 16px; /* Imposta la dimensione del testo */
+    margin-right: 10px; /* Aggiunge uno spazio a destra tra la label e l'elemento di input/select */
+}
+#fields-container {
+    margin-top: 10px;
+    border-collapse: collapse;
+}
+
+
+.field td {
+    padding: 5px;
+}
+
+.add-field-button {
+    margin-top: 10px;
+}
+
+.remove-field {
+    border-radius: 9px;
+    background-color: #e33321;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+.remove-field:hover{
+    background-color: #673735;
+}
+
+input[type="text"],
+select {
+    background: #c6d5dae6;
+    border-radius: 9px;
+    color: #ffffff;
+    padding: 5px;
+    width: 130px;
+}
+#add-field{
+    border-radius: 9px;
+    background-color: rgb(0 170 229);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Aggiungi questa riga per l'effetto di transizione */
+}
+#add-field:hover {
+    background-color: #18fff7; /* Colore differente quando si passa sopra il pulsante */
+}
+
+input[type="submit"] {
+    border-radius: 9px;
+    background-color: #26de73;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Aggiungi questa riga per l'effetto di transizione */
+}
+
+input[type="submit"]:hover {
+    background-color: #2f774d; /* Colore differente quando si passa sopra il pulsante */
+}
+
+
+/* Aggiungi altre regole di stile secondo le tue esigenze */
