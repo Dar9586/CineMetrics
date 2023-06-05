@@ -18,22 +18,20 @@ def create_object():
     field_names = request.form.getlist('field_name[]')
     field_values = request.form.getlist('field_value[]')
     table = request.form.get("table")
+    # Create object dynamically
     new_object = dict()
-
     for name, value in zip(field_names, field_values):
+        if name == "_id":
+            value = ObjectId(value)
         try:
             value = json.loads(value)
         except:
             pass
-
-        if name.endswith("_id"):
-            try:
-                value = ObjectId(value)
-            except:
-                # Handling invalid ObjectId value
-                return "Invalid ObjectId value for field: {}".format(name)
-
         new_object[name] = value
+
+    # Example: Accessing the dynamically created object
+    for name, value in new_object.items():
+        print(f"{name}: {value}")
 
     db[table].insert_one(new_object)
 
@@ -102,18 +100,13 @@ def get_field_of_collection():
             }
         }
     ]
-
     result = db[selected_collection].aggregate(pipeline)
-
-    # Extract the fields from the result
     fields = result.next()["fields"]
 
     fields = list(fields)
     fields.remove("_id")
     fields.sort()
     return jsonify(fields)
-
-
 
 
 @app.route('/show/<collection_name>/<page>')

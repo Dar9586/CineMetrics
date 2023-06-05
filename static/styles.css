@@ -3,7 +3,7 @@ body {
     background-image: url('/static/48891.jpg');
     background-size: cover;
     background-repeat: no-repeat;
-
+    min-height: 1080px;
 }
 
 body {
