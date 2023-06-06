@@ -6,11 +6,21 @@ body {
     min-height: 1080px;
 }
 
+.navbar {
+background-color: #f2f2f2;
+padding: 30px;
+text-align: center;
+}
+
+.navbar a {
+    text-decoration: none;
+    margin-right: 10px;
+}
+
 body {
     font-family: Arial, sans-serif;
     background-color: #ffffff;
     margin: 0;
-    padding: 20px;
 }
 
 
@@ -117,6 +127,16 @@ select {
 input[type="submit"] {
     border-radius: 9px;
     background-color: #26de73;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Aggiungi questa riga per l'effetto di transizione */
+}
+
+a{
+border-radius: 9px;
+    background-color: ##6ac0fd;
     color: #fff;
     border: none;
     padding: 10px 20px;
