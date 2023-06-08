@@ -71,6 +71,7 @@ def apply_search():
         except:
             pass
         new_object[name] = {op: value}
+
     return render_query(table, new_object, page)
 
 
