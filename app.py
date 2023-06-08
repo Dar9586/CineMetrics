@@ -137,6 +137,10 @@ def search():
 def add_document_admin():
     return render_template('add-document.html', is_admin=True)
 
+@app.route('/')
+def home():
+    return render_template('index.html', is_admin=True)
+
 
 @app.route('/add-document')
 def add_document():
