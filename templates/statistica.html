@@ -1,20 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <title>Lista con bottone</title>
 </head>
 <body>
   <h2>Seleziona un elemento dalla lista:</h2>
-  <form method="get" action="media-revenue">
-  <select name="elemento">
-      {% for item in generi %}
-        <option value="{{ item }}">{{ item }}</option>
-      {% endfor %}
-    </select>
+  <form method="get" action="/statistics/average-revenue">
+  <label for="genere">Scegli genere:</label>
+  <select id="genere" name="genre">
+    {% for genre_item in genre_list %}
+      {% if genre_item==genre %}
+        <option selected="selected" value="{{ genre_item }}">{{ genre_item }}</option>
+      {% else %}
+        <option value="{{ genre_item }}">{{ genre_item }}</option>
+      {% endif %}
+    {% endfor %}
+  </select>
   <br><br>
-  <button onclick="mostraSelezione()">Mostra selezione</button>
+    <input type="submit" value="Mostra media">
   </form>
-  <p id="selezione">{{average_revenue}}</p>
+  <p id="media">{{average_revenue}}</p>
 
   <script>
 

@@ -2,7 +2,7 @@ import json
 from typing import Mapping, Any
 
 from bson import ObjectId
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, Response
 from pymongo import MongoClient
 
 # Number of items per page
@@ -68,7 +68,7 @@ def render_query(collection_name: str, query: Mapping[str, Any], page: int):
                            current_page=page)
 
 
-@app.route('/apply-search', methods=['GET'])
+@app.route('/apply-search')
 def apply_search():
     # Riceve i parametri di ricerca dalla query string
     page = int(request.args.get("page"))
@@ -93,7 +93,6 @@ def apply_search():
             query[name][op] = value
         else:
             query[name] = condition
-
 
     # Esegue la ricerca e il rendering dei risultati
     return render_query(table, query, page)
@@ -170,31 +169,36 @@ def search():
 
 @app.route('/add-document/admin')
 def add_document_admin():
-    # Renderizza il template 'add-document.html' per gli amministratori
-    return render_template('add-document.html', is_admin=True)
+    auth = request.authorization
+
+    if auth and auth.username == 'root' and auth.password == 'root':
+        return render_template('add-document.html', is_admin=True)
+    else:
+        return Response('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 
 @app.route('/')
 def home():
     return render_template('index.html', is_admin=True)
 
-@app.route('/statistica')
-def statistica():
-    collection = db['movies_metadata']
-    # Esecuzione della query per ottenere i generi unici
-    generi = collection.distinct('genres.name')
-    print(generi)
-    return render_template('statistica.html',generi=generi, is_admin=True)
-@app.route('/media-revenue', methods=['GET'])
+
+@app.route('/statistics/average-revenue')
 def media_revenue():
     collection = db['movies_metadata']
-    generi = collection.distinct('genres.name')
-    selezione = request.form.get('elemento')
-    films = collection.find({'genres.name': selezione})
-    revenue_list = [film['revenue'] for film in films]
-    average_revenue = sum(revenue_list) / len(revenue_list) \
-    if revenue_list else 0
-    return render_template('statistica.html', generi=generi,selezione=selezione, average_revenue=average_revenue)
+    genre_list = collection.distinct('genres.name')
+    genre_list.sort()
+    genre = request.args.get("genre")
+    average_revenue = ""
+    if genre is not None:
+        films = collection.find({
+            '$and': [
+                {'genres.name': genre},
+                {'revenue': {'$type': 'number'}}
+            ]
+        }, {'revenue': 1})
+        revenue_list = [film['revenue'] for film in films]
+        average_revenue = sum(revenue_list) / len(revenue_list) if revenue_list else 0
+    return render_template('statistica.html', genre_list=genre_list, genre=genre, average_revenue=average_revenue)
 
 
 @app.route('/add-document')
@@ -207,7 +211,7 @@ def add_document():
     return render_template('add-document.html', col=collection_names, is_admin=False)
 
 
-@app.route('/update/<collection_name>/<object_id>', methods=["GET"])
+@app.route('/update/<collection_name>/<object_id>')
 def update_form(collection_name, object_id):
     collection = db[collection_name]
     document = collection.find_one({"_id": ObjectId(object_id)})
