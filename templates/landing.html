@@ -2,14 +2,18 @@
 <html lang="en">
 <head>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-    <title>BLOCKBUSTER</title>
+    <title>Blockbusters</title>
 </head>
 <body>
-
- <div class="navbar">
+    <div class="navbar">
         <a href="/" class="active">Home</a>
         <a href="/add-document">Add document</a>
         <a href="/search">Search</a>
+    </div>
+    <div id="landing-container" class="container">
+        <h1 id="landing-title">Welcome to our Film Website!</h1>
+        <p id="landing-description">Discover and explore a collection of amazing films.</p>
+        <img src="../static/popcorn.png" alt="Popcorn" id="popcorn-img" class="swing-animation">
     </div>
 </body>
 </html>
