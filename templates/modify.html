@@ -15,17 +15,17 @@
 <h1>Update Object</h1>
 <form action="/apply-update/{{collection_name}}/{{object_id}}" method="POST">
     <table>
-        {% for key, value in collection|sort_dict %}
-        <tr>
-            <td><label>Field name:</label></td>
-            <td><input name="field_name[]" required type="text" value="{{key}}"></td>
-            <td><label>Field Value:</label></td>
-            <td><textarea name="field_value[]">{{value}}</textarea></td>
-            <td>
-                <button class="remove-field">Remove</button>
-            </td>
-        </tr>
-        {% endfor %}
+    {% for key, value in collection|sort_dict %}
+    <tr>
+        <td><label>Field name:</label></td>
+        <td><input name="field_name[]" required type="text" value="{{key}}"></td>
+        <td><label>Field Value:</label></td>
+        <td><textarea name="field_value[]">{{value}}</textarea></td>
+        <td>
+            <button class="remove-field">Remove</button>
+        </td>
+    </tr>
+    {% endfor %}
     </table>
     <input type="submit" value="Submit">
 </form>
