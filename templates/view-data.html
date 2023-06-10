@@ -25,7 +25,11 @@
                 </li>
                 {% endfor %}
                 <li>
-                    <button onclick="deleteDocument('{{ col_name }}', '{{ item[_id] }}')">Delete Document</button>
+                    <button _id onclick="deleteDocument('{{ col_name }}', '{{ item["
+                    "] }}')">Delete Document</button>
+                    <a _id href="/update/{{ col_name }}/{{ item[""] }}">
+                    <button>Update Document</button>
+                    </a>
                 </li>
             </ul>
         </div>
@@ -62,6 +66,26 @@
 
 <script>
     function deleteDocument(collectionName, documentId) {
+        // Send an HTTP POST request to the Flask route for deleting the document
+        fetch('/delete/' + collectionName + '/' + documentId, {method: 'POST'})
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+                // Display a success or failure message based on the response
+                if (data.deleted_count === 1) {
+                    alert('Document deleted successfully.');
+                    // Refresh the page or update the UI as needed
+                    location.reload();
+                } else {
+                    alert('Failed to delete document.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    function updateDocument(collectionName, documentId) {
         // Send an HTTP POST request to the Flask route for deleting the document
         fetch('/delete/' + collectionName + '/' + documentId, {method: 'POST'})
             .then(response => response.json())

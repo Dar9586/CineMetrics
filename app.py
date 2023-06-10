@@ -12,6 +12,7 @@ app = Flask(__name__)
 client = MongoClient("mongodb://localhost:27017/")
 db = client["DBFilm"]
 
+
 # Set landing page
 @app.route('/')
 def landing_page():
@@ -24,7 +25,7 @@ def create_object():
     field_names = request.form.getlist('field_name[]')
     field_values = request.form.getlist('field_value[]')
     table = request.form.get("table")
-    
+
     # Crea un nuovo oggetto dinamicamente usando i dati ricevuti dal form
     new_object = dict()
     for name, value in zip(field_names, field_values):
@@ -41,9 +42,12 @@ def create_object():
         print(f"{name}: {value}")
 
     # Inserisce il nuovo oggetto nel database nella collezione specificata
-    db[table].insert_one(new_object)
+    result = db[table].insert_one(new_object)
 
-    return "Object created successfully!"
+    if result.acknowledged:
+        return "Object created successfully!"
+    else:
+        return "Error in create"
 
 
 def render_query(collection_name: str, query: Mapping[str, Any], page: int):
@@ -58,7 +62,7 @@ def render_query(collection_name: str, query: Mapping[str, Any], page: int):
 
     # Calcola il numero totale di pagine in base al numero totale di documenti e al numero di documenti per pagina
     total_pages = total_items // ITEMS_PER_PAGE + (1 if total_items % ITEMS_PER_PAGE > 0 else 0)
-    
+
     # Renderizza il template 'view-data.html' con i dati recuperati
     return render_template('view-data.html', col_name=collection_name, items=items, total_page=total_pages,
                            current_page=page)
@@ -72,7 +76,7 @@ def apply_search():
     field_operation = request.args.getlist('field_operation[]')
     field_values = request.args.getlist('field_value[]')
     table = request.args.get("table")
-    
+
     # Crea un nuovo oggetto di query dinamicamente usando i parametri ricevuti dalla query string
     new_object = dict()
     for name, op, value in zip(field_names, field_operation, field_values):
@@ -92,7 +96,7 @@ def apply_search():
 def get_field_of_collection():
     # Riceve il nome della collezione
     selected_collection = request.args.get('collection')
-    
+
     # Utilizza l'aggregazione per ottenere tutti i campi unici della collezione
     pipeline = [
         {
@@ -122,7 +126,7 @@ def get_field_of_collection():
     fields = list(fields)
     fields.remove("_id")
     fields.sort()
-    
+
     # Restituisce i campi come JSON
     return jsonify(fields)
 
@@ -139,10 +143,10 @@ def delete_document(collection_name, document_id):
     print(collection_name, document_id)
     collection = db[collection_name]
     document_id = ObjectId(document_id)
-    
+
     # Elimina il documento dalla collezione
     result = collection.delete_one({'_id': document_id})
-    
+
     # Restituisce il numero di documenti eliminati come JSON
     return jsonify({'deleted_count': result.deleted_count})
 
@@ -152,7 +156,7 @@ def search():
     # Ottiene i nomi delle collezioni presenti nel database
     collection_names = db.list_collection_names()
     collection_names.sort()
-    
+
     # Renderizza il template 'search-document.html' con i nomi delle collezioni
     return render_template('search-document.html', col=collection_names)
 
@@ -161,6 +165,7 @@ def search():
 def add_document_admin():
     # Renderizza il template 'add-document.html' per gli amministratori
     return render_template('add-document.html', is_admin=True)
+
 
 @app.route('/')
 def home():
@@ -172,9 +177,43 @@ def add_document():
     # Ottiene i nomi delle collezioni presenti nel database
     collection_names = db.list_collection_names()
     collection_names.sort()
-    
+
     # Renderizza il template 'add-document.html' per gli utenti non amministratori
     return render_template('add-document.html', col=collection_names, is_admin=False)
+
+
+@app.route('/update/<collection_name>/<object_id>', methods=["GET"])
+def update_form(collection_name, object_id):
+    collection = db[collection_name]
+    document = collection.find_one({"_id": ObjectId(object_id)})
+    del document["_id"]
+    return render_template('modify.html', collection=document, collection_name=collection_name, object_id=object_id)
+
+
+@app.route('/apply-update/<collection_name>/<object_id>', methods=["POST"])
+def apply_update(collection_name, object_id):
+    field_names = request.form.getlist('field_name[]')
+    field_values = request.form.getlist('field_value[]')
+    new_object = dict()
+    for name, value in zip(field_names, field_values):
+        if name == "_id":
+            value = ObjectId(value)
+        try:
+            value = json.loads(value)
+        except:
+            pass
+        new_object[name] = value
+    print(new_object)
+    result = db[collection_name].update_one({'_id': ObjectId(object_id)}, {'$set': new_object})
+    if result.acknowledged:
+        return "Object updated successfully!"
+    else:
+        return "Error in update"
+
+
+@app.template_filter('sort_dict')
+def sort_dict(dictionary):
+    return sorted(dictionary.items())
 
 
 if __name__ == '__main__':
