@@ -14,7 +14,7 @@
 
 <h1>Update Object</h1>
 <form action="/apply-update/{{collection_name}}/{{object_id}}" method="POST">
-    <table>
+    <table><tbody  id="fields-container">
     {% for key, value in collection|sort_dict %}
     <tr>
         <td><label>Field name:</label></td>
@@ -26,8 +26,27 @@
         </td>
     </tr>
     {% endfor %}
+        </tbody>
     </table>
+    <button id="add-field" type="button">Add Field</button>
     <input type="submit" value="Submit">
+
+    <script>
+                document.getElementById("add-field").addEventListener("click", function() {
+            const fieldsContainer = document.getElementById("fields-container");
+            const field = document.createElement("tr");
+            field.innerHTML = '<tr>\n' +
+                '        <td><label>Field name:</label></td>\n' +
+                '        <td><input name="field_name[]" required type="text"></td>\n' +
+                '        <td><label>Field Value:</label></td>\n' +
+                '        <td><textarea name="field_value[]"></textarea></td>\n' +
+                '        <td>\n' +
+                '            <button class="remove-field">Remove</button>\n' +
+                '        </td>\n' +
+                '    </tr>';
+            fieldsContainer.appendChild(field);
+        });
+    </script>
 </form>
 </body>
 </html>
