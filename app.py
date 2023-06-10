@@ -86,7 +86,18 @@ def apply_search():
             value = json.loads(value)
         except:
             pass
-        new_object[name] = {op: value}
+        
+        if name in new_object:
+            # Se il campo esiste già nel dizionario, controlla se esiste una lista di operazioni per quel campo
+            if isinstance(new_object[name], list):
+                # Aggiungi la nuova operazione alla lista di operazioni esistente
+                new_object[name].append({op: value})
+            else:
+                # Crea una lista di operazioni per il campo e aggiungi sia il vincolo precedente che il nuovo vincolo
+                existing_op = new_object[name]
+                new_object[name] = [existing_op, {op: value}]
+        else:
+            new_object[name] = {op: value}
 
     # Esegue la ricerca e il rendering dei risultati
     return render_query(table, new_object, page)
