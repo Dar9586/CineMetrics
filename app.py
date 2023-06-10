@@ -11,12 +11,21 @@ ITEMS_PER_PAGE = 25
 app = Flask(__name__)
 client = MongoClient("mongodb://localhost:27017/")
 db = client["DBFilm"]
+admin_db = client["DBFilmAdmin"]
 
 
 # Set landing page
 @app.route('/')
 def landing_page():
     return render_template('landing.html')
+
+
+def insert_new_fields(table: str, param: list):
+    admin_db["fields"].update_one(
+        {'name': table},
+        {'$addToSet': {'declared_fields': {'$each': param}}},
+        upsert=True
+    )
 
 
 @app.route('/create-document', methods=['POST'])
@@ -45,6 +54,8 @@ def create_object():
     result = db[table].insert_one(new_object)
 
     if result.acknowledged:
+        insert_new_fields(table, list(new_object.keys()))
+
         return "Object created successfully!"
     else:
         return "Error in create"
@@ -100,40 +111,17 @@ def apply_search():
 
 @app.route('/get-fields')
 def get_field_of_collection():
-    # Riceve il nome della collezione
     selected_collection = request.args.get('collection')
-
-    # Utilizza l'aggregazione per ottenere tutti i campi unici della collezione
-    pipeline = [
-        {
-            "$project": {
-                "fields": {"$objectToArray": "$$ROOT"}
-            }
-        },
-        {
-            "$unwind": "$fields"
-        },
-        {
-            "$group": {
-                "_id": None,
-                "fields": {"$addToSet": "$fields.k"}
-            }
-        },
-        {
-            "$project": {
-                "_id": 0,
-                "fields": 1
-            }
-        }
-    ]
-    result = db[selected_collection].aggregate(pipeline)
-    fields = result.next()["fields"]
-
-    fields = list(fields)
+    fields = admin_db["fields"].find_one({'name': selected_collection})
+    if fields is None:
+        res = db[selected_collection].find_one()
+        if res is None:
+            res = {}
+        insert_new_fields(selected_collection, list(res.keys()))
+        fields = admin_db["fields"].find_one({'name': selected_collection})
+    fields = list(fields["declared_fields"])
     fields.remove("_id")
     fields.sort()
-
-    # Restituisce i campi come JSON
     return jsonify(fields)
 
 
