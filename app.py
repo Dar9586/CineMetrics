@@ -7,11 +7,19 @@ from pymongo import MongoClient
 
 # Number of items per page
 ITEMS_PER_PAGE = 25
+VIEW_COUNT_FIELD = "view_count"
 
 app = Flask(__name__)
 client = MongoClient("mongodb://localhost:27017/")
 db = client["DBFilm"]
 admin_db = client["DBFilmAdmin"]
+
+
+def increment_view_count(collection, document_id):
+    db[collection].update_one(
+        {'_id': document_id},
+        {'$inc': {VIEW_COUNT_FIELD: 1}},
+    )
 
 
 # Set landing page
@@ -49,7 +57,7 @@ def create_object():
     # Esempio: Accesso all'oggetto creato dinamicamente
     for name, value in new_object.items():
         print(f"{name}: {value}")
-
+    new_object[VIEW_COUNT_FIELD] = 0
     # Inserisce il nuovo oggetto nel database nella collezione specificata
     result = db[table].insert_one(new_object)
 
@@ -67,7 +75,9 @@ def render_query(collection_name: str, query: Mapping[str, Any], page: int):
     collection = db[collection_name]
     # Recupera i documenti dalla collezione con la paginazione
     items = collection.find(query).skip(skip).limit(ITEMS_PER_PAGE)
-
+    items = list(items)
+    for item in items:
+        increment_view_count(collection_name, item["_id"])
     # Conta il numero totale di documenti nella collezione
     total_items = collection.count_documents(query)
 
