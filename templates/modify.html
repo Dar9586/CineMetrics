@@ -22,7 +22,7 @@
         <td><label>Field Value:</label></td>
         <td><textarea name="field_value[]">{{value}}</textarea></td>
         <td>
-            <button class="remove-field">Remove</button>
+            <input class="remove-field" type="button" value="Remove">
         </td>
     </tr>
     {% endfor %}
@@ -41,11 +41,19 @@
                 '        <td><label>Field Value:</label></td>\n' +
                 '        <td><textarea name="field_value[]"></textarea></td>\n' +
                 '        <td>\n' +
-                '            <button class="remove-field">Remove</button>\n' +
+                '            <input type="button" class="remove-field" value="Remove">\n' +
                 '        </td>\n' +
                 '    </tr>';
-            fieldsContainer.appendChild(field);
-        });
+                    fieldsContainer.appendChild(field);
+                });
+
+                document.addEventListener("click", function (event) {
+                    if (event.target && event.target.classList.contains("remove-field")) {
+                        const field = event.target.parentNode.parentNode;
+                        field.parentNode.removeChild(field);
+                    }
+                });
+
     </script>
 </form>
 </body>
