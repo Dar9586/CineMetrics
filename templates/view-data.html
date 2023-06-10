@@ -9,7 +9,7 @@
  <div class="navbar">
         <a href="/">Home</a>
         <a href="/add-document">Add document</a>
-        <a href="/search">Search</a>
+        <a href="/search" class="active">Search</a>
     </div>
 <div class="container">
     <h1>Collection Viewer</h1>
@@ -25,7 +25,7 @@
                 </li>
                 {% endfor %}
                 <li>
-                    <button onclick="deleteDocument('{{ col_name }}', '{{ item['_id'] }}')">Delete Document</button>
+                    <button onclick="deleteDocument('{{ col_name }}', '{{ item[_id] }}')">Delete Document</button>
                 </li>
             </ul>
         </div>
