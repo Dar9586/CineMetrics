@@ -178,6 +178,24 @@ def add_document_admin():
 def home():
     return render_template('index.html', is_admin=True)
 
+@app.route('/statistica')
+def statistica():
+    collection = db['movies_metadata']
+    # Esecuzione della query per ottenere i generi unici
+    generi = collection.distinct('genres.name')
+    print(generi)
+    return render_template('statistica.html',generi=generi, is_admin=True)
+@app.route('/media-revenue', methods=['GET'])
+def media_revenue():
+    collection = db['movies_metadata']
+    generi = collection.distinct('genres.name')
+    selezione = request.form.get('elemento')
+    films = collection.find({'genres.name': selezione})
+    revenue_list = [film['revenue'] for film in films]
+    average_revenue = sum(revenue_list) / len(revenue_list) \
+    if revenue_list else 0
+    return render_template('statistica.html', generi=generi,selezione=selezione, average_revenue=average_revenue)
+
 
 @app.route('/add-document')
 def add_document():

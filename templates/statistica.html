@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lista con bottone</title>
+</head>
+<body>
+  <h2>Seleziona un elemento dalla lista:</h2>
+  <form method="get" action="media-revenue">
+  <select name="elemento">
+      {% for item in generi %}
+        <option value="{{ item }}">{{ item }}</option>
+      {% endfor %}
+    </select>
+  <br><br>
+  <button onclick="mostraSelezione()">Mostra selezione</button>
+  </form>
+  <p id="selezione">{{average_revenue}}</p>
+
+  <script>
+
+  </script>
+</body>
+</html>
