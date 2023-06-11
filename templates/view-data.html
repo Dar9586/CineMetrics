@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styleList.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
@@ -25,6 +26,7 @@
     </style>
     <title>Collection Viewer</title>
 </head>
+
 <body>
     <div class="navbar">
         <a href="/">Home</a>
@@ -63,7 +65,53 @@
     </div>
 
     <script>
-        // JavaScript code
+
+        function visitPage(page){
+            const params = new URLSearchParams(window.location.search);
+            params.set("page",page);
+            // Redirect the user to the constructed URL
+            window.location.href = '/apply-search?' + params.toString();
+        }
+
+        function deleteDocument(collectionName, documentId) {
+            // Send an HTTP POST request to the Flask route for deleting the document
+            fetch('/delete/' + collectionName + '/' + documentId, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    // Display a success or failure message based on the response
+                    if (data.deleted_count === 1) {
+                        alert('Document deleted successfully.');
+                        // Refresh the page or update the UI as needed
+                        location.reload();
+                    } else {
+                        alert('Failed to delete document.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+        function updateDocument(collectionName, documentId) {
+            // Send an HTTP POST request to the Flask route for deleting the document
+            fetch('/delete/' + collectionName + '/' + documentId, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    // Display a success or failure message based on the response
+                    if (data.deleted_count === 1) {
+                        alert('Document deleted successfully.');
+                        // Refresh the page or update the UI as needed
+                        location.reload();
+                    } else {
+                        alert('Failed to delete document.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
     </script>
 </body>
+
 </html>
