@@ -188,12 +188,6 @@ def add_document_admin():
         return Response('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
 
-
-@app.route('/')
-def home():
-    return render_template('index.html', is_admin=True)
-
-
 @app.route('/statistics/average-revenue')
 def media_revenue():
     collection = db['movies_metadata']
