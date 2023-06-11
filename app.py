@@ -2,9 +2,9 @@ import json
 import re
 from typing import Mapping, Any
 
+import pymongo
 from bson import ObjectId
 from flask import Flask, render_template, request, jsonify, redirect, url_for, Response,session
-from datetime import timedelta
 from pymongo import MongoClient
 
 # Number of items per page
@@ -16,10 +16,6 @@ client = MongoClient("mongodb://localhost:27017/")
 db = client["DBFilm"]
 admin_db = client["DBFilmAdmin"]
 
-app.secret_key = 'pp'
-
-# Imposta la durata della sessione a 1 minuto
-app.permanent_session_lifetime = timedelta(minutes=1)
 
 def increment_view_count(collection, document_id):
     db[collection].update_one(
@@ -75,12 +71,14 @@ def create_object():
         return "Error in create"
 
 
-def render_query(collection_name: str, query: Mapping[str, Any], page: int):
+def render_query(collection_name: str, query: Mapping[str, Any], page: int, order_field: str, order_desc: bool):
+    order_type = pymongo.DESCENDING if order_desc else pymongo.ASCENDING
+
     # Calcola il numero di documenti da saltare in base al numero di pagina e al numero di documenti per pagina
     skip = (page - 1) * ITEMS_PER_PAGE
     collection = db[collection_name]
     # Recupera i documenti dalla collezione con la paginazione
-    items = collection.find(query).skip(skip).limit(ITEMS_PER_PAGE)
+    items = collection.find(query).skip(skip).limit(ITEMS_PER_PAGE).sort(order_field, order_type)
     items = list(items)
     for item in items:
         increment_view_count(collection_name, item["_id"])
@@ -103,7 +101,8 @@ def apply_search():
     field_operation = request.args.getlist('field_operation[]')
     field_values = request.args.getlist('field_value[]')
     table = request.args.get("table")
-
+    order_field = request.args.get("order-field")
+    order_desc = request.args.get("order-desc")=="on"
     # Crea un nuovo oggetto di query dinamicamente usando i parametri ricevuti dalla query string
     query = {}
 
@@ -128,7 +127,7 @@ def apply_search():
             query[name] = condition
 
     # Esegue la ricerca e il rendering dei risultati
-    return render_query(table, query, page)
+    return render_query(table, query, page, order_field, order_desc)
 
 
 @app.route('/get-fields')
@@ -182,7 +181,6 @@ def add_document_admin():
     auth = request.authorization
 
     if auth and auth.username == 'root' and auth.password == 'root':
-        session.permanent = True  # Imposta la sessione come permanente
         return render_template('add-document.html', is_admin=True)
     else:
         return Response('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
@@ -206,22 +204,22 @@ def media_revenue():
         average_revenue = sum(revenue_list) / len(revenue_list) if revenue_list else 0
 
     pipeline = [
-            {
-                "$unwind": "$genres"
-            },
-            {
-                "$group": {
-                    "_id": "$genres.name",
-                    "averageRevenue": {"$avg": "$revenue"}
-                }
-            },
-            {
-                "$sort": {"averageRevenue": -1}
-            },
-            {
-                "$limit": 10
+        {
+            "$unwind": "$genres"
+        },
+        {
+            "$group": {
+                "_id": "$genres.name",
+                "averageRevenue": {"$avg": "$revenue"}
             }
-        ]
+        },
+        {
+            "$sort": {"averageRevenue": -1}
+        },
+        {
+            "$limit": 10
+        }
+    ]
 
     genres_revenue_10 = list(collection.aggregate(pipeline))
     return render_template('statistics_average_revenue.html', genre_list=genre_list, genre=genre, average_revenue=average_revenue,genres_revenue_10=genres_revenue_10)
