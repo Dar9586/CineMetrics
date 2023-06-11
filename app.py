@@ -1,4 +1,5 @@
 import json
+import re
 from typing import Mapping, Any
 
 from bson import ObjectId
@@ -114,7 +115,13 @@ def apply_search():
         except:
             pass
 
-        condition = {op: value}
+        if op == "containsIgnoreCase":
+            # Create a case-insensitive regex pattern
+            pattern = re.compile(re.escape(value), re.IGNORECASE)
+            condition = {"$regex": pattern}
+        else:
+            condition = {op: value}
+
         if name in query:
             query[name][op] = value
         else:
