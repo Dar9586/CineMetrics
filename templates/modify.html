@@ -1,60 +1,64 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
+
 <head>
     <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
     <title>Create Object</title>
 </head>
+
 <body>
 
-<div class="navbar">
-    <a href="/">Home</a>
-    <a class="active" href="/add-document">Add document</a>
-    <a href="/search">Search</a>
-</div>
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a class="active" href="/add-document">Add document</a>
+        <a href="/search">Search</a>
+    </div>
 
-<h1>Update Object</h1>
-<form action="/apply-update/{{collection_name}}/{{object_id}}" method="POST">
-    <table><tbody  id="fields-container">
-    {% for key, value in collection|sort_dict %}
-    <tr>
-        <td><label>Field name:</label></td>
-        <td><input name="field_name[]" required type="text" value="{{key}}"></td>
-        <td><label>Field Value:</label></td>
-        <td><textarea name="field_value[]">{{value}}</textarea></td>
-        <td>
-            <input class="remove-field" type="button" value="Remove">
-        </td>
-    </tr>
-    {% endfor %}
-        </tbody>
-    </table>
-    <button id="add-field" type="button">Add Field</button>
-    <input type="submit" value="Submit">
+    <h1>Update Object</h1>
+    <form action="/apply-update/{{collection_name}}/{{object_id}}" method="POST">
+        <table>
+            <tbody id="fields-container">
+                {% for key, value in collection|sort_dict %}
+                <tr>
+                    <td><label>Field name:</label></td>
+                    <td><input name="field_name[]" required type="text" value="{{key}}"></td>
+                    <td><label>Field Value:</label></td>
+                    <td><textarea name="field_value[]">{{value}}</textarea></td>
+                    <td>
+                        <input class="remove-field" type="button" value="Remove">
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button id="add-field" type="button">Add Field</button>
+        <input type="submit" value="Submit">
 
-    <script>
-                document.getElementById("add-field").addEventListener("click", function() {
-            const fieldsContainer = document.getElementById("fields-container");
-            const field = document.createElement("tr");
-            field.innerHTML = '<tr>\n' +
-                '        <td><label>Field name:</label></td>\n' +
-                '        <td><input name="field_name[]" required type="text"></td>\n' +
-                '        <td><label>Field Value:</label></td>\n' +
-                '        <td><textarea name="field_value[]"></textarea></td>\n' +
-                '        <td>\n' +
-                '            <input type="button" class="remove-field" value="Remove">\n' +
-                '        </td>\n' +
-                '    </tr>';
-                    fieldsContainer.appendChild(field);
-                });
+        <script>
+            document.getElementById("add-field").addEventListener("click", function () {
+                const fieldsContainer = document.getElementById("fields-container");
+                const field = document.createElement("tr");
+                field.innerHTML = '<tr>\n' +
+                    '        <td><label>Field name:</label></td>\n' +
+                    '        <td><input name="field_name[]" required type="text"></td>\n' +
+                    '        <td><label>Field Value:</label></td>\n' +
+                    '        <td><textarea name="field_value[]"></textarea></td>\n' +
+                    '        <td>\n' +
+                    '            <input type="button" class="remove-field" value="Remove">\n' +
+                    '        </td>\n' +
+                    '    </tr>';
+                fieldsContainer.appendChild(field);
+            });
 
-                document.addEventListener("click", function (event) {
-                    if (event.target && event.target.classList.contains("remove-field")) {
-                        const field = event.target.parentNode.parentNode;
-                        field.parentNode.removeChild(field);
-                    }
-                });
+            document.addEventListener("click", function (event) {
+                if (event.target && event.target.classList.contains("remove-field")) {
+                    const field = event.target.parentNode.parentNode;
+                    field.parentNode.removeChild(field);
+                }
+            });
 
-    </script>
-</form>
+        </script>
+    </form>
 </body>
+
 </html>

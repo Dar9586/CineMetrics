@@ -1,41 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
     <title>Search document</title>
 </head>
+
 <body>
- <div class="navbar">
+    <div class="navbar">
         <a href="/">Home</a>
         <a href="/add-document">Add document</a>
         <a href="/search" class="active">Search</a>
     </div>
-<h1>Search document</h1>
-<form action="/apply-search" id="object-form" method="get">
-    <table>
-        <tr>
-            <td>
-    <input hidden="hidden" name="page" type="number" value="1">
-    <label for="collection-select">Tabella</label><select id="collection-select" name="table" onchange="fetchFields()">
+    <h1>Search document</h1>
+    <form action="/apply-search" id="object-form" method="get">
+        <table>
+            <tr>
+                <td>
+                    <input hidden="hidden" name="page" type="number" value="1">
+                    <label for="collection-select">Tabella</label><select id="collection-select" name="table"
+                        onchange="fetchFields()">
 
-    {% for colle in col %}
-                <option value="{{colle}}">{{ colle }}</option>
-            {% endfor %}
-        <!-- Add more options for other collections -->
-    </select>
+                        {% for colle in col %}
+                        <option value="{{colle}}">{{ colle }}</option>
+                        {% endfor %}
+                        <!-- Add more options for other collections -->
+                    </select>
                 </td>
-            <td>
-    <label for="order-by-select">Order by:</label>
-            </td>
-            <td>
-    <div id="order-by-select">&nbsp;</div>
+                <td>
+                    <label for="order-by-select">Order by:</label>
                 </td>
-            <td>
-    <label for="order-by-desc">Descending order?</label>
-    <input type="checkbox" name="order-desc" id="order-by-desc">
-        </td>
-        </tr>
-</table>
+                <td>
+                    <div id="order-by-select">&nbsp;</div>
+                </td>
+                <td>
+                    <label for="order-by-desc">Descending order?</label>
+                    <input type="checkbox" name="order-desc" id="order-by-desc">
+                </td>
+            </tr>
+        </table>
         <table id="fields-container"></table>
 
         <button id="add-field" type="button">Add Field</button>
@@ -75,16 +78,16 @@
             if (selectedCollection !== "") {
                 // Make AJAX request to fetch fields for selected collection
                 const xhr = new XMLHttpRequest();
-                xhr.onreadystatechange = function() {
+                xhr.onreadystatechange = function () {
                     if (xhr.readyState === 4 && xhr.status === 200) {
                         const fieldsContainer = document.getElementById("fields-container");
                         const fields = JSON.parse(xhr.responseText);
 
                         genericSelect = createSelectWithOptions(fields);
-                        const orderSelect=document.getElementById("order-by-select");
+                        const orderSelect = document.getElementById("order-by-select");
 
-                        const order=genericSelect.cloneNode(true);
-                        order.name="order-field"
+                        const order = genericSelect.cloneNode(true);
+                        order.name = "order-field"
                         orderSelect.removeChild(orderSelect.firstChild);
                         orderSelect.appendChild(order);
 
@@ -99,7 +102,7 @@
         }
         fetchFields();
         // Add field on button click
-        document.getElementById("add-field").addEventListener("click", function() {
+        document.getElementById("add-field").addEventListener("click", function () {
             const fieldsContainer = document.getElementById("fields-container");
             const field = document.createElement("tr");
             field.className = "field";
@@ -114,14 +117,14 @@
                 '        <option value="$in">&#8712;</option>\n' +
                 '        <option value="$nin">&#8713;</option>\n' +
                 '        <option value="containsIgnoreCase">contains</option>\n' +
-                '    </select></td>'+
+                '    </select></td>' +
                 '<td><label>Field Value:</label></td><td><input type="text" name="field_value[]" required> </td>' +
                 '<td><button class="remove-field">Remove</button></td>';
             fieldsContainer.appendChild(field);
         });
 
         // Remove field on button click
-        document.addEventListener("click", function(event) {
+        document.addEventListener("click", function (event) {
             if (event.target && event.target.classList.contains("remove-field")) {
                 const field = event.target.parentNode.parentNode;
                 field.parentNode.removeChild(field);
@@ -129,4 +132,5 @@
         });
     </script>
 </body>
+
 </html>
