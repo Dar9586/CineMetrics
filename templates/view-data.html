@@ -37,33 +37,43 @@
             {% endfor %}
         </div>
 
-        <div class="pagination">
-            {% if current_page > 1 %}
-            <a href="{{ url_for('get_data', collection_name=col_name, page=1) }}">First</a>
-            <a href="{{ url_for('get_data', collection_name=col_name, page=current_page-1) }}">Previous</a>
-            {% endif %}
+    <div class="pagination">
+        {% if current_page > 1 %}
+        <a onclick="visitPage(1)">First</a>
+        <a onclick="visitPage({{current_page-1}})">Previous</a>
+        {% endif %}
 
-            {% set start_page = current_page - 5 if current_page > 5 else 1 %}
-            {% set end_page = current_page + 5 if current_page + 5 <= total_page else total_page %} {% for page_num in
-                range(start_page, end_page+1) %} {% if page_num==current_page %} <span class="current-page">{{ page_num
-                }}</span>
-                {% else %}
-                <a href="{{ url_for('get_data', collection_name=col_name, page=page_num) }}">{{ page_num }}</a>
-                {% endif %}
-                {% endfor %}
+        {% set start_page = current_page - 5 if current_page > 5 else 1 %}
+        {% set end_page = current_page + 5 if current_page + 5 <= total_page else total_page %}
 
-                {% if current_page < total_page %} <a
-                    href="{{ url_for('get_data', collection_name=col_name, page=current_page+1) }}">Next</a>
-                    <a href="{{ url_for('get_data', collection_name=col_name, page=total_page) }}">Last</a>
-                    {% endif %}
-        </div>
+        {% for page_num in range(start_page, end_page+1) %}
+        {% if page_num == current_page %}
+        <span class="current-page">{{ page_num }}</span>
+        {% else %}
+        <a onclick="visitPage({{page_num}})">{{ page_num }}</a>
+        {% endif %}
+        {% endfor %}
+
+        {% if current_page < total_page %}
+        <a onclick="visitPage({{current_page+1}})" >Next</a>
+        <a onclick="visitPage({{total_page}})">Last</a>
+        {% endif %}
     </div>
+</div>
 
     <div class="loading-screen">
         <div class="loading-text">Loading...</div>
     </div>
 
     <script>
+
+        function visitPage(page){
+            const params = new URLSearchParams(window.location.search);
+            params.set("page",page);
+            // Redirect the user to the constructed URL
+            window.location.href = '/apply-search?' + params.toString();
+        }
+
         function deleteDocument(collectionName, documentId) {
             // Send an HTTP POST request to the Flask route for deleting the document
             fetch('/delete/' + collectionName + '/' + documentId, { method: 'POST' })
