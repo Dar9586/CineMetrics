@@ -3,103 +3,67 @@
 <head>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styleList.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .item {
+            margin-bottom: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        .item table {
+            width: 100%;
+        }
+        .item th {
+            text-align: left;
+        }
+        .item td {
+            padding: 5px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+    </style>
     <title>Collection Viewer</title>
 </head>
 <body>
- <div class="navbar">
+    <div class="navbar">
         <a href="/">Home</a>
         <a href="/add-document">Add document</a>
         <a href="/search" class="active">Search</a>
     </div>
-<div class="container">
-    <h1>Collection Viewer</h1>
-
-    <div class="items">
-        {% for item in items %}
-        <div class="item">
-            <ul>
-                {% for key, value in item.items() if key != "_id" %}
-                <li>
-                    <strong>{{ key }}:</strong>
-                    <span>{{ value }}</span>
-                </li>
-                {% endfor %}
-                <li>
-                    <button onclick="deleteDocument('{{ col_name }}', '{{ item["_id"] }}')">Delete Document</button>
-                    <a  href="/update/{{ col_name }}/{{ item["_id"] }}"><button class="updateButton">Update Document</button></a>
-                </li>
-            </ul>
+    <div class="container">
+        <h1>Collection Viewer</h1>
+        <div class="items">
+            {% for item in items %}
+            <div class="item">
+                <table>
+                    {% for key, value in item.items() if key != "_id" %}
+                    <tr>
+                        <th>{{ key }}</th>
+                        <td>{{ value }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="2">
+                            <button onclick="deleteDocument('{{ col_name }}', '{{ item["_id"] }}')">Delete Document</button>
+                            <a href="/update/{{ col_name }}/{{ item["_id"] }}"><button class="updateButton">Update Document</button></a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            {% endfor %}
         </div>
-        {% endfor %}
+        <div class="pagination">
+            <!-- Pagination code -->
+        </div>
     </div>
 
-    <div class="pagination">
-        {% if current_page > 1 %}
-        <a href="{{ url_for('get_data', collection_name=col_name, page=1) }}">First</a>
-        <a href="{{ url_for('get_data', collection_name=col_name, page=current_page-1) }}">Previous</a>
-        {% endif %}
-
-        {% set start_page = current_page - 5 if current_page > 5 else 1 %}
-        {% set end_page = current_page + 5 if current_page + 5 <= total_page else total_page %}
-
-        {% for page_num in range(start_page, end_page+1) %}
-        {% if page_num == current_page %}
-        <span class="current-page">{{ page_num }}</span>
-        {% else %}
-        <a href="{{ url_for('get_data', collection_name=col_name, page=page_num) }}">{{ page_num }}</a>
-        {% endif %}
-        {% endfor %}
-
-        {% if current_page < total_page %}
-        <a href="{{ url_for('get_data', collection_name=col_name, page=current_page+1) }}">Next</a>
-        <a href="{{ url_for('get_data', collection_name=col_name, page=total_page) }}">Last</a>
-        {% endif %}
+    <div class="loading-screen">
+        <div class="loading-text">Loading...</div>
     </div>
-</div>
 
-<div class="loading-screen">
-    <div class="loading-text">Loading...</div>
-</div>
-
-<script>
-    function deleteDocument(collectionName, documentId) {
-        // Send an HTTP POST request to the Flask route for deleting the document
-        fetch('/delete/' + collectionName + '/' + documentId, {method: 'POST'})
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                // Display a success or failure message based on the response
-                if (data.deleted_count === 1) {
-                    alert('Document deleted successfully.');
-                    // Refresh the page or update the UI as needed
-                    location.reload();
-                } else {
-                    alert('Failed to delete document.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }
-    function updateDocument(collectionName, documentId) {
-        // Send an HTTP POST request to the Flask route for deleting the document
-        fetch('/delete/' + collectionName + '/' + documentId, {method: 'POST'})
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                // Display a success or failure message based on the response
-                if (data.deleted_count === 1) {
-                    alert('Document deleted successfully.');
-                    // Refresh the page or update the UI as needed
-                    location.reload();
-                } else {
-                    alert('Failed to delete document.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
-    }
-</script>
+    <script>
+        // JavaScript code
+    </script>
 </body>
 </html>
