@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link href="/static/jsmaps/jsmaps.css" rel="stylesheet" type="text/css"/>
+    <script crossorigin="anonymous"
+            integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <title>Blockbusters</title>
+</head>
+
+<body>
+<div class="navbar">
+    <a class="active" href="/">Home</a>
+    <a href="/add-document">Add document</a>
+    <a href="/search">Search</a>
+</div>
+
+<div class="jsmaps-wrapper" id="world-map"></div>
+
+
+<script src="/static/jsmaps/jsmaps-libs.js" type="text/javascript"></script>
+<script src="/static/jsmaps/jsmaps-panzoom.js" type="text/javascript"></script>
+<script src="/static/jsmaps/jsmaps.min.js" type="text/javascript"></script>
+<script src="/static/jsmaps/world.js" type="text/javascript"></script>
+<script type="text/javascript">
+
+    function toGood(country_name, obj) {
+        if (!obj) return "";
+        // Initialize the HTML string
+        let htmlString = '<div>';
+
+        // Add the movie count
+        htmlString += '<h2>Movie Count in ' + country_name + ': ' + obj["movie_count"] + '</h2>';
+        htmlString += '<h3>Popular genres:</h3>'
+        // Add the top genres
+        htmlString += '<ul>';
+        obj["top_genres"].forEach(function (genre) {
+            htmlString += '<li>' + genre.genre + ' (' + genre.count + ')</li>';
+        });
+        htmlString += '</ul>';
+
+        // Close the wrapping div
+        htmlString += '</div>';
+
+        return htmlString;
+
+    }
+
+    const genresRevenues = JSON.parse('{{ map_data|tojson }}');
+    window.JSMaps.maps.world.config.defaultText = "";
+    for (let i = 0; i < window.JSMaps.maps.world.paths.length; i++) {
+        const item = window.JSMaps.maps.world.paths[i];
+        const abbr = item["abbreviation"];
+        const targetIndex = genresRevenues.findIndex(function (obj) {
+            return obj["country"] === abbr;
+        });
+        if (targetIndex === -1) {
+            item["enable"] = false;
+            continue;
+        }
+        item["text"] = toGood(item["name"], genresRevenues[targetIndex]);
+    }
+
+
+    $(function () {
+        $('#world-map').JSMaps({
+            map: 'world' //Use any map as named in the maps folder e.g. usa
+        });
+    });
+</script>
+</body>
+
+</html>
