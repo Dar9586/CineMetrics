@@ -196,7 +196,27 @@ def media_revenue():
         }, {'revenue': 1})
         revenue_list = [film['revenue'] for film in films]
         average_revenue = sum(revenue_list) / len(revenue_list) if revenue_list else 0
-    return render_template('statistica.html', genre_list=genre_list, genre=genre, average_revenue=average_revenue)
+
+    pipeline = [
+            {
+                "$unwind": "$genres"
+            },
+            {
+                "$group": {
+                    "_id": "$genres.name",
+                    "averageRevenue": {"$avg": "$revenue"}
+                }
+            },
+            {
+                "$sort": {"averageRevenue": -1}
+            },
+            {
+                "$limit": 10
+            }
+        ]
+
+    genres_revenue_10 = list(collection.aggregate(pipeline))
+    return render_template('statistica.html', genre_list=genre_list, genre=genre, average_revenue=average_revenue,genres_revenue_10=genres_revenue_10)
 
 
 @app.route('/add-document')
