@@ -2,7 +2,8 @@ import json
 from typing import Mapping, Any
 
 from bson import ObjectId
-from flask import Flask, render_template, request, jsonify, redirect, url_for, Response
+from flask import Flask, render_template, request, jsonify, redirect, url_for, Response,session
+from datetime import timedelta
 from pymongo import MongoClient
 
 # Number of items per page
@@ -14,6 +15,10 @@ client = MongoClient("mongodb://localhost:27017/")
 db = client["DBFilm"]
 admin_db = client["DBFilmAdmin"]
 
+app.secret_key = 'pp'
+
+# Imposta la durata della sessione a 1 minuto
+app.permanent_session_lifetime = timedelta(minutes=1)
 
 def increment_view_count(collection, document_id):
     db[collection].update_one(
@@ -170,9 +175,11 @@ def add_document_admin():
     auth = request.authorization
 
     if auth and auth.username == 'root' and auth.password == 'root':
+        session.permanent = True  # Imposta la sessione come permanente
         return render_template('add-document.html', is_admin=True)
     else:
         return Response('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
 
 
 @app.route('/')
@@ -216,7 +223,7 @@ def media_revenue():
         ]
 
     genres_revenue_10 = list(collection.aggregate(pipeline))
-    return render_template('statistica.html', genre_list=genre_list, genre=genre, average_revenue=average_revenue,genres_revenue_10=genres_revenue_10)
+    return render_template('statistics_average_revenue.html', genre_list=genre_list, genre=genre, average_revenue=average_revenue,genres_revenue_10=genres_revenue_10)
 
 
 @app.route('/add-document')

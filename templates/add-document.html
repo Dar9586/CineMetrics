@@ -5,33 +5,38 @@
     <title>Create Object</title>
 </head>
 <body>
-
- <div class="navbar">
+    {% if is_admin %}
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/add-document" class="active">Add document</a>
+        <a href="/search">Search</a>
+        <a href="/statistics/average-revenue">Statitiche</a>
+    </div>
+    {% else %}
+    <div class="navbar">
         <a href="/">Home</a>
         <a href="/add-document" class="active">Add document</a>
         <a href="/search">Search</a>
     </div>
+    {% endif %}
 
-<h1>Create Object</h1>
-<form action="/create-document" id="object-form" method="post">
-    <label for="collection-select">Tabella: </label>
-    {% if is_admin %}
-    <!--suppress XmlDuplicatedId -->
-    <input id="collection-select" name="table" type="text">
-    {% else %}
-    <!--suppress XmlDuplicatedId -->
-    <select id="collection-select" name="table" onchange="fetchFields()">
-
-        {% for colle in col %}
-        <option value="{{colle}}">{{ colle }}</option>
-        {% endfor %}
+    <h1>Create Object</h1>
+    <form action="/create-document" id="object-form" method="post" autocomplete="off">
+        <label for="collection-select">Tabella: </label>
+        {% if is_admin %}
+        <!--suppress XmlDuplicatedId -->
+        <input id="collection-select" name="table" type="text">
+        {% else %}
+        <!--suppress XmlDuplicatedId -->
+        <select id="collection-select" name="table" onchange="fetchFields()">
+            {% for colle in col %}
+            <option value="{{colle}}">{{ colle }}</option>
+            {% endfor %}
+        </select>
         {% endif %}
         <!-- Add more options for other collections -->
-    </select>
-
-    <table id="fields-container"></table>
-
-    <button id="add-field" type="button">Add Field</button>
+        <table id="fields-container"></table>
+        <button id="add-field" type="button">Add Field</button>
         <br><br>
         <input type="submit" value="Create Object">
     </form>
@@ -68,7 +73,9 @@
                 xhr.send();
             }
         }
+
         fetchFields();
+
         // Add field on button click
         document.getElementById("add-field").addEventListener("click", function() {
             const fieldsContainer = document.getElementById("fields-container");

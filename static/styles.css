@@ -167,6 +167,9 @@ border-radius: 9px;
 input[type="submit"]:hover {
     background-color: #2f774d; /* Colore differente quando si passa sopra il pulsante */
 }
+#media{
+    color:#f61c1c
+}
 
 #landing-container.container {
     margin: 50px auto;
