@@ -4,7 +4,7 @@ from typing import Mapping, Any
 
 import pymongo
 from bson import ObjectId
-from flask import Flask, render_template, request, jsonify, redirect, url_for, Response,session
+from flask import Flask, render_template, request, jsonify, redirect, url_for, Response
 from pymongo import MongoClient
 
 # Number of items per page
@@ -102,7 +102,7 @@ def apply_search():
     field_values = request.args.getlist('field_value[]')
     table = request.args.get("table")
     order_field = request.args.get("order-field")
-    order_desc = request.args.get("order-desc")=="on"
+    order_desc = request.args.get("order-desc") == "on"
     # Crea un nuovo oggetto di query dinamicamente usando i parametri ricevuti dalla query string
     query = {}
 
@@ -166,6 +166,54 @@ def delete_document(collection_name, document_id):
     return jsonify({'deleted_count': result.deleted_count})
 
 
+@app.route('/statistics/map')
+def map_view():
+    pipeline = [
+        # Unwind the 'countries' array
+        {"$unwind": "$production_countries"},
+
+        # Unwind the 'genres' array
+        {"$unwind": "$genres"},
+
+        # Group by 'countries' and 'genres', count the occurrences
+        {"$group": {"_id": {"country": "$production_countries.iso_3166_1", "genre": "$genres.name"},
+                    "count": {"$sum": 1}}},
+
+        # Exclude null
+        {"$match": {"$and": [{"_id.genre": {"$ne": None}}, {"_id.country": {"$ne": None}}]}},
+
+        # Sort by count in descending order
+        {"$sort": {"_id.country": 1, "count": -1}},
+
+        # Group by 'countries' again and push the genres and counts into an array
+        {"$group": {"_id": "$_id.country", "top_genres": {"$push": {"genre": "$_id.genre", "count": "$count"}}}},
+
+        # Project the required fields
+        {"$project": {"country": "$_id", "top_genres": {"$slice": ["$top_genres", 3]}, "_id": 0}},
+
+        # Sort the final result by country
+        {"$sort": {"country": 1}},
+
+        # Lookup to get the count of movies produced in each country
+        {
+            "$lookup": {
+                "from": "movies_metadata",  # Replace with your movies collection name
+                "localField": "country",
+                "foreignField": "production_countries.iso_3166_1",
+                "as": "movies"
+            }
+        },
+
+        # Project the count of movies produced in each country
+        {"$project": {"country": 1, "top_genres": 1, "movie_count": {"$size": "$movies"}}},
+
+        # Order by movie_count in a descendent way
+        {"$sort": {"movie_count": -1}}
+    ]
+    results = db["movies_metadata"].aggregate(pipeline)
+    return render_template('map.html', map_data=list(results))
+
+
 @app.route('/search')
 def search():
     # Ottiene i nomi delle collezioni presenti nel database
@@ -222,7 +270,8 @@ def media_revenue():
     ]
 
     genres_revenue_10 = list(collection.aggregate(pipeline))
-    return render_template('statistics_average_revenue.html', genre_list=genre_list, genre=genre, average_revenue=average_revenue,genres_revenue_10=genres_revenue_10)
+    return render_template('statistics_average_revenue.html', genre_list=genre_list, genre=genre,
+                           average_revenue=average_revenue, genres_revenue_10=genres_revenue_10)
 
 
 @app.route('/add-document')
