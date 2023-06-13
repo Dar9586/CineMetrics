@@ -3,9 +3,39 @@
 
 <head>
     <link href="/static/jsmaps/jsmaps.css" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
     <script crossorigin="anonymous"
             integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+    li,h3{
+    color:white
+    }
 
+
+
+
+      #world-map {
+            width: 50%; /* Imposta la larghezza al 50% del contenitore */
+            float: left; /* Posiziona il div a sinistra */
+        }
+
+        #testo {
+            width: 50%; /* Imposta la larghezza al 50% del contenitore */
+            float: right; /* Posiziona il div a destra */
+        }
+
+    #testo{
+    background:#c6612c;
+    border-radius: 10px;
+    padding: 3px;
+    }
+
+
+    #testo{
+        float: center; /* Posiziona il div a destra */
+        width: 50%; /* Imposta la larghezza al 50% del contenitore */
+    }
+</style>
     <title>Blockbusters</title>
 </head>
 
@@ -15,7 +45,7 @@
     <a href="/add-document">Add document</a>
     <a href="/search">Search</a>
 </div>
-
+<div style="width:600px; display:inline">
 <div class="jsmaps-wrapper" id="world-map"></div>
 
 
@@ -28,7 +58,7 @@
     function toGood(country_name, obj) {
         if (!obj) return "";
         // Initialize the HTML string
-        let htmlString = '<div>';
+        let htmlString = '<div id="testo">';
 
         // Add the movie count
         htmlString += '<h2>Movie Count in ' + country_name + ': ' + obj["movie_count"] + '</h2>';
@@ -59,6 +89,7 @@
             item["enable"] = false;
             continue;
         }
+
         item["text"] = toGood(item["name"], genresRevenues[targetIndex]);
     }
 
@@ -68,7 +99,10 @@
             map: 'world' //Use any map as named in the maps folder e.g. usa
         });
     });
+
+
 </script>
+    </div>
 </body>
 
 </html>
