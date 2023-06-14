@@ -17,6 +17,12 @@ db = client["DBFilm"]
 admin_db = client["DBFilmAdmin"]
 
 
+@app.template_test()
+def list_or_dict(value):
+    print(type(value), isinstance(value, list) or isinstance(value, dict))
+    return isinstance(value, list) or isinstance(value, dict)
+
+
 def increment_view_count(collection, document_id):
     db[collection].update_one(
         {'_id': document_id},

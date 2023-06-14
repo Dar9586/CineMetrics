@@ -2,6 +2,8 @@
 <html lang="en">
 
 <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r224/prettify.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r224/prettify.css" />
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styleList.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -42,7 +44,15 @@
                     {% for key, value in item.items() if key != "_id" %}
                     <tr>
                         <th>{{ key }}</th>
+                        {% if value is list_or_dict %}
+                        <td>
+                            <code class="prettyprint lang-json">{{ value }}</code>
+                            <pre class="prettyprint lang-json" hidden></pre>
+                        </td>
+
+                        {%else%}
                         <td>{{ value }}</td>
+                        {% endif %}
                     </tr>
                     {% endfor %}
                     <tr>
@@ -131,7 +141,38 @@
                     console.error('Error:', error);
                 });
         }
+        function hasAncestorWithClassName(node, className) {
+          // Traverse up the DOM tree until reaching the top (document node)
+          while (node.parentNode) {
+            node = node.parentNode;
+
+            // Check if the ancestor node has the specified class name
+            if (node.classList && node.classList.contains(className)) {
+              return node;
+            }
+          }
+          // No ancestor with the specified class name found
+          return null;
+        }
+        document.addEventListener("mousedown", function (event) {
+            const ancestor=hasAncestorWithClassName(event.target,"prettyprint");
+            if (event.target && ancestor!=null) {
+                //event.target.hidden=true;
+                const pre=ancestor.parentNode.getElementsByTagName("pre")[0];
+                const code=ancestor.parentNode.getElementsByTagName("code")[0];
+                if(pre.textContent.length<1) {
+                    const data = code.textContent.replaceAll("'", '"');
+                    const js = JSON.parse(data);
+                    const pretty = prettyPrintOne(JSON.stringify(js, null, 2));
+                    pre.innerHTML = pretty;
+                }
+                pre.hidden=!pre.hidden;
+                code.hidden=!code.hidden;
+            }
+        });
     </script>
+    <script>addEventListener('load', function(event) { PR.prettyPrint(); }, false);</script>
+
 </body>
 
 </html>
