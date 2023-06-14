@@ -172,7 +172,63 @@ def delete_document(collection_name, document_id):
     return jsonify({'deleted_count': result.deleted_count})
 
 
-@app.route('/statistics/map')
+@app.route('/statistics')
+def statistics():
+    collection = db['movies_metadata']
+    map_data = map_view()
+    genre_list = collection.distinct('genres.name')
+    revenue_data = media_revenue()
+    return render_template('statistics.html', genre_list=genre_list, genres_revenue_10=revenue_data, map_data=map_data)
+
+@app.route("/statistics/media")
+def single_media_revenue():
+    collection = db['movies_metadata']
+    genre = request.args.get("genre")
+    average_revenue = ""
+    if genre is not None:
+        films = collection.find({
+            '$and': [
+                {'genres.name': genre},
+                {'revenue': {'$type': 'number'}}
+            ]
+        }, {'revenue': 1})
+        revenue_list = [film['revenue'] for film in films]
+        average_revenue = sum(revenue_list) / len(revenue_list) if revenue_list else 0
+    return jsonify(average_revenue)
+
+
+def media_revenue():
+    collection = db['movies_metadata']
+    genre_list = collection.distinct('genres.name')
+    genre_list.sort()
+
+    pipeline = [
+        {
+            "$unwind": "$genres"
+        },
+        {
+            "$match": {
+                "genres.name": {"$ne": None}
+            }
+        },
+        {
+            "$group": {
+                "_id": "$genres.name",
+                "averageRevenue": {"$avg": "$revenue"}
+            }
+        },
+        {
+            "$sort": {"averageRevenue": -1}
+        },
+        {
+            "$limit": 10
+        }
+    ]
+
+    genres_revenue_10 = list(collection.aggregate(pipeline))
+    return genres_revenue_10
+
+
 def map_view():
     pipeline = [
         # Unwind the 'countries' array
@@ -217,7 +273,7 @@ def map_view():
         {"$sort": {"movie_count": -1}}
     ]
     results = db["movies_metadata"].aggregate(pipeline)
-    return render_template('map.html', map_data=list(results))
+    return list(results)
 
 
 @app.route('/search')
@@ -238,46 +294,6 @@ def add_document_admin():
         return render_template('add-document.html', is_admin=True)
     else:
         return Response('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
-
-
-@app.route('/statistics/average-revenue')
-def media_revenue():
-    collection = db['movies_metadata']
-    genre_list = collection.distinct('genres.name')
-    genre_list.sort()
-    genre = request.args.get("genre")
-    average_revenue = ""
-    if genre is not None:
-        films = collection.find({
-            '$and': [
-                {'genres.name': genre},
-                {'revenue': {'$type': 'number'}}
-            ]
-        }, {'revenue': 1})
-        revenue_list = [film['revenue'] for film in films]
-        average_revenue = sum(revenue_list) / len(revenue_list) if revenue_list else 0
-
-    pipeline = [
-        {
-            "$unwind": "$genres"
-        },
-        {
-            "$group": {
-                "_id": "$genres.name",
-                "averageRevenue": {"$avg": "$revenue"}
-            }
-        },
-        {
-            "$sort": {"averageRevenue": -1}
-        },
-        {
-            "$limit": 10
-        }
-    ]
-
-    genres_revenue_10 = list(collection.aggregate(pipeline))
-    return render_template('statistics_average_revenue.html', genre_list=genre_list, genre=genre,
-                           average_revenue=average_revenue, genres_revenue_10=genres_revenue_10)
 
 
 @app.route('/add-document')
