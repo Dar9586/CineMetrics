@@ -174,6 +174,13 @@ def delete_document(collection_name, document_id):
 
 @app.route('/statistics')
 def statistics():
+    auth = request.authorization
+
+    if auth and auth.username == 'root' and auth.password == 'root':
+        pass
+    else:
+        return Response('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
     collection = db['movies_metadata']
     map_data = map_view()
     genre_list = collection.distinct('genres.name')
