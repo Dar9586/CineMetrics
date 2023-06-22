@@ -177,15 +177,13 @@ def statistics():
     auth = request.authorization
 
     if auth and auth.username == 'root' and auth.password == 'root':
-        pass
+        collection = db['movies_metadata']
+        map_data = map_view()
+        genre_list = collection.distinct('genres.name')
+        revenue_data = media_revenue()
+        return render_template('statistics.html', genre_list=genre_list, genres_revenue_10=revenue_data, map_data=map_data)
     else:
         return Response('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
-
-    collection = db['movies_metadata']
-    map_data = map_view()
-    genre_list = collection.distinct('genres.name')
-    revenue_data = media_revenue()
-    return render_template('statistics.html', genre_list=genre_list, genres_revenue_10=revenue_data, map_data=map_data)
 
 @app.route("/statistics/media")
 def single_media_revenue():
