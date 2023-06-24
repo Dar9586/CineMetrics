@@ -247,47 +247,63 @@ def media_revenue():
 
 def map_view():
     pipeline = [
-        # Unwind the 'countries' array
+        # Match documents where production_countries.iso_3166_1 and genres.name exist
+        {"$match": {
+            "production_countries.iso_3166_1": {"$exists": True},
+            "genres.name": {"$exists": True}
+        }},
+
+        # Unwind the production_countries array
         {"$unwind": "$production_countries"},
 
-        # Unwind the 'genres' array
+        # Unwind the genres array
         {"$unwind": "$genres"},
 
-        # Group by 'countries' and 'genres', count the occurrences
-        {"$group": {"_id": {"country": "$production_countries.iso_3166_1", "genre": "$genres.name"},
-                    "count": {"$sum": 1}}},
+        # Group documents by country and genre, and count the occurrences
+        {"$group": {
+            "_id": {"country": "$production_countries.iso_3166_1", "genre": "$genres.name"},
+            "count": {"$sum": 1}
+        }},
 
-        # Exclude null
-        {"$match": {"$and": [{"_id.genre": {"$ne": None}}, {"_id.country": {"$ne": None}}]}},
-
-        # Sort by count in descending order
+        # Sort the documents by country in ascending order and count in descending order
         {"$sort": {"_id.country": 1, "count": -1}},
 
-        # Group by 'countries' again and push the genres and counts into an array
-        {"$group": {"_id": "$_id.country", "top_genres": {"$push": {"genre": "$_id.genre", "count": "$count"}}}},
+        # Group documents by country and push the top genres and their counts into an array
+        {"$group": {
+            "_id": "$_id.country",
+            "top_genres": {"$push": {"genre": "$_id.genre", "count": "$count"}},
+            "movie_count": {"$sum": 1}
+        }},
 
-        # Project the required fields
-        {"$project": {"country": "$_id", "top_genres": {"$slice": ["$top_genres", 3]}, "_id": 0}},
+        # Project the required fields: country, top_genres (limited to 3), movie_count (1 indicates at least one movie)
+        {"$project": {
+            "country": "$_id",
+            "top_genres": {"$slice": ["$top_genres", 3]},
+            "movie_count": 1,
+            "_id": 0
+        }},
 
-        # Sort the final result by country
-        {"$sort": {"country": 1}},
+        # Perform a lookup to get the movies associated with each country
+        {"$lookup": {
+            "from": "movies_metadata",
+            "localField": "country",
+            "foreignField": "production_countries.iso_3166_1",
+            "as": "movies"
+        }},
 
-        # Lookup to get the count of movies produced in each country
-        {
-            "$lookup": {
-                "from": "movies_metadata",  # Replace with your movies collection name
-                "localField": "country",
-                "foreignField": "production_countries.iso_3166_1",
-                "as": "movies"
-            }
-        },
+        # Add a new field 'movie_count' that represents the size of the 'movies' array
+        {"$addFields": {
+            "movie_count": {"$size": "$movies"}
+        }},
 
-        # Project the count of movies produced in each country
-        {"$project": {"country": 1, "top_genres": 1, "movie_count": {"$size": "$movies"}}},
-
-        # Order by movie_count in a descendent way
-        {"$sort": {"movie_count": -1}}
+        # Project the final fields: country, top_genres, movie_count
+        {"$project": {
+            "country": 1,
+            "top_genres": 1,
+            "movie_count": 1
+        }}
     ]
+
     results = db["movies_metadata"].aggregate(pipeline)
     return list(results)
 

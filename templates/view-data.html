@@ -144,7 +144,7 @@
                 const pre=ancestor.parentNode.getElementsByTagName("pre")[0];
                 const code=ancestor.parentNode.getElementsByTagName("code")[0];
                 if(pre.textContent.length<1) {
-                    const data = code.textContent.replaceAll("'", '"');
+                    const data = code.textContent;
                     const js = JSON.parse(data);
                     const pretty = prettyPrintOne(JSON.stringify(js, null, 2));
                     pre.innerHTML = pretty;
