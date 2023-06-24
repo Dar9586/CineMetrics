@@ -4,6 +4,7 @@
 <head>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r224/prettify.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r224/prettify.css" />
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styleList.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
@@ -34,6 +35,7 @@
         <a href="/">Home</a>
         <a href="/add-document">Add document</a>
         <a href="/search" class="active">Search</a>
+        <a href="/statistics">Statistics</a>
     </div>
     <div class="container">
         <h1>Collection Viewer</h1>
@@ -104,25 +106,6 @@
         }
 
         function deleteDocument(collectionName, documentId) {
-            // Send an HTTP POST request to the Flask route for deleting the document
-            fetch('/delete/' + collectionName + '/' + documentId, { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data);
-                    // Display a success or failure message based on the response
-                    if (data.deleted_count === 1) {
-                        alert('Document deleted successfully.');
-                        // Refresh the page or update the UI as needed
-                        location.reload();
-                    } else {
-                        alert('Failed to delete document.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        }
-        function updateDocument(collectionName, documentId) {
             // Send an HTTP POST request to the Flask route for deleting the document
             fetch('/delete/' + collectionName + '/' + documentId, { method: 'POST' })
                 .then(response => response.json())

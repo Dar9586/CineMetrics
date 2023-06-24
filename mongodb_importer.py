@@ -1,7 +1,6 @@
 from pymongo import MongoClient
 import csv
 import os
-import json
 
 MONGO_URL = "mongodb://localhost:27017"
 MONGO_DB = "DBFilm"
@@ -55,10 +54,6 @@ def main():
     mongodb_client = MongoClient(MONGO_URL)
     database = mongodb_client[MONGO_DB]
     convert_folder_csv_to_json(PATH_WITH_CSV, database)
-    # mydoc = database["movies_metadata"].find({"id":862})
-    # for x in mydoc:
-    #    print(x)
-    # print(mydoc)
 
 
 if __name__ == '__main__':

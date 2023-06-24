@@ -17,9 +17,8 @@ color:black
     padding: 3px;
     border-radius: 9px;
     color: #fff;
-    margin: 3px;
     text-decoration: none;
-    margin-right: 10px;
+    margin: 3px 10px 3px 3px;
 }
 
 .navbar a:hover {
@@ -32,7 +31,6 @@ color:black
 .navbar a.active {
     color: #3dc374;
     font-weight: bold;
-    color:#3dc374
   }
 
 .navbar a.active:hover {
@@ -73,7 +71,7 @@ input[type="text"] {
 }
 #collection-select {
     appearance: none;
-    background-color: #c9d8dbb5;
+    background-color: rgba(135, 142, 144, 0.9);
     border: 1px solid #6ac0fd;
     color: #fff;
     padding: 10px;
@@ -125,15 +123,15 @@ label {
     background-color: #673735;
 }
 
-input[type="text"],
+input[type="text"],textarea,
 select {
-    background: #c6d5dae6;
+    background: rgba(135, 142, 144, 0.9);
     border-radius: 9px;
     color: #ffffff;
     padding: 5px;
     width: 130px;
 }
-#add-field{
+.blue-button{
     border-radius: 9px;
     background-color: rgb(0 170 229);
     color: #fff;
@@ -142,7 +140,7 @@ select {
     cursor: pointer;
     transition: background-color 0.3s ease; /* Aggiungi questa riga per l'effetto di transizione */
 }
-#add-field:hover {
+.blue-button:hover {
     background-color: #18fff7; /* Colore differente quando si passa sopra il pulsante */
 }
 
@@ -179,7 +177,7 @@ input[type="submit"]:hover {
     background-color: #c6d5da;
     border-radius: 10px;
     text-align: center;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
 #landing-title {

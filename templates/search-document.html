@@ -19,9 +19,8 @@
             <tr>
                 <td>
                     <input hidden="hidden" name="page" type="number" value="1">
-                    <label for="collection-select">Tabella</label><select id="collection-select" name="table"
-                        onchange="fetchFields()">
-
+                    <label for="collection-select">Table</label>
+                    <select id="collection-select" name="table" onchange="fetchFields()">
                         {% for colle in col %}
                         <option value="{{colle}}">{{ colle }}</option>
                         {% endfor %}
@@ -42,7 +41,7 @@
         </table>
         <table id="fields-container"></table>
 
-        <button id="add-field" type="button">Add Field</button>
+        <input id="add-field" class="blue-button" value="Add Field" type="button">
         <br><br>
         <input type="submit" value="Search document">
     </form>
@@ -115,8 +114,6 @@
                 '        <option value="$gte">&#8805;</option>\n' +
                 '        <option value="$lt">&lt;</option>\n' +
                 '        <option value="$lte">&#8804;</option>\n' +
-                '        <option value="$in">&#8712;</option>\n' +
-                '        <option value="$nin">&#8713;</option>\n' +
                 '        <option value="containsIgnoreCase">contains</option>\n' +
                 '    </select></td>' +
                 '<td><label>Field Value:</label></td><td><input type="text" name="field_value[]" required> </td>' +

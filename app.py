@@ -19,8 +19,12 @@ admin_db = client["DBFilmAdmin"]
 
 @app.template_test()
 def list_or_dict(value):
-    print(type(value), isinstance(value, list) or isinstance(value, dict))
-    return isinstance(value, list) or isinstance(value, dict)
+    try:
+        value = json.loads(value)
+        print(type(value), isinstance(value, list) or isinstance(value, dict))
+        return isinstance(value, list) or isinstance(value, dict)
+    except:
+        return False
 
 
 def increment_view_count(collection, document_id):
@@ -86,8 +90,13 @@ def render_query(collection_name: str, query: Mapping[str, Any], page: int, orde
     # Recupera i documenti dalla collezione con la paginazione
     items = collection.find(query).skip(skip).limit(ITEMS_PER_PAGE).sort(order_field, order_type)
     items = list(items)
+    good_items = []
     for item in items:
         increment_view_count(collection_name, item["_id"])
+        del item["_id"]
+        good_items.append(
+            {key: (json.dumps(value) if not isinstance(value, str) else value) for key, value in item.items()})
+
     # Conta il numero totale di documenti nella collezione
     total_items = collection.count_documents(query)
 
@@ -95,7 +104,7 @@ def render_query(collection_name: str, query: Mapping[str, Any], page: int, orde
     total_pages = total_items // ITEMS_PER_PAGE + (1 if total_items % ITEMS_PER_PAGE > 0 else 0)
 
     # Renderizza il template 'view-data.html' con i dati recuperati
-    return render_template('view-data.html', col_name=collection_name, items=items, total_page=total_pages,
+    return render_template('view-data.html', col_name=collection_name, items=good_items, total_page=total_pages,
                            current_page=page)
 
 
@@ -181,9 +190,11 @@ def statistics():
         map_data = map_view()
         genre_list = collection.distinct('genres.name')
         revenue_data = media_revenue()
-        return render_template('statistics.html', genre_list=genre_list, genres_revenue_10=revenue_data, map_data=map_data)
+        return render_template('statistics.html', genre_list=genre_list, genres_revenue_10=revenue_data,
+                               map_data=map_data)
     else:
         return Response('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
 
 @app.route("/statistics/media")
 def single_media_revenue():
@@ -316,6 +327,7 @@ def update_form(collection_name, object_id):
     collection = db[collection_name]
     document = collection.find_one({"_id": ObjectId(object_id)})
     del document["_id"]
+    document = {key: (json.dumps(value) if not isinstance(value, str) else value) for key, value in document.items()}
     return render_template('modify.html', collection=document, collection_name=collection_name, object_id=object_id)
 
 

@@ -16,7 +16,7 @@
 
     <h1>Create Object</h1>
     <form action="/create-document" id="object-form" method="post" autocomplete="off">
-        <label for="collection-select">Tabella: </label>
+        <label for="collection-select">Table: </label>
         {% if is_admin %}
         <!--suppress XmlDuplicatedId -->
         <input id="collection-select" name="table" type="text">
@@ -27,10 +27,13 @@
             <option value="{{colle}}">{{ colle }}</option>
             {% endfor %}
         </select>
+        <a href="/add-document/admin">
+            <input type="button" value="Create new table" class="blue-button">
+        </a>
         {% endif %}
         <!-- Add more options for other collections -->
         <table id="fields-container"></table>
-        <button id="add-field" type="button">Add Field</button>
+        <input id="add-field" class="blue-button" value="Add Field" type="button">
         <br><br>
         <input type="submit" value="Create Object">
     </form>
