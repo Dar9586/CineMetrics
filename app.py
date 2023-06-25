@@ -1,5 +1,6 @@
 import json
 import re
+from datetime import datetime
 from typing import Mapping, Any
 
 import pymongo
@@ -65,7 +66,7 @@ def create_object():
         except:
             pass
         new_object[name] = value
-
+    new_object["create_time"] = datetime.now()
     # Esempio: Accesso all'oggetto creato dinamicamente
     for name, value in new_object.items():
         print(f"{name}: {value}")
@@ -95,7 +96,8 @@ def render_query(collection_name: str, query: Mapping[str, Any], page: int, orde
         increment_view_count(collection_name, item["_id"])
         del item["_id"]
         good_items.append(
-            {key: (json.dumps(value) if not isinstance(value, str) else value) for key, value in item.items()})
+            {key: str(value) if isinstance(value, datetime) else (
+                json.dumps(value) if not isinstance(value, str) else value) for key, value in item.items()})
 
     # Conta il numero totale di documenti nella collezione
     total_items = collection.count_documents(query)
