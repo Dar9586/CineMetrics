@@ -94,9 +94,8 @@ def render_query(collection_name: str, query: Mapping[str, Any], page: int, orde
     good_items = []
     for item in items:
         increment_view_count(collection_name, item["_id"])
-        del item["_id"]
         good_items.append(
-            {key: str(value) if isinstance(value, datetime) else (
+            {key: str(value) if isinstance(value, datetime) or isinstance(value, ObjectId) else (
                 json.dumps(value) if not isinstance(value, str) else value) for key, value in item.items()})
 
     # Conta il numero totale di documenti nella collezione
@@ -372,6 +371,7 @@ def apply_update(collection_name, object_id):
         except:
             pass
         new_object[name] = value
+    new_object["last_update"] = datetime.now()
     print(new_object)
     result = db[collection_name].update_one({'_id': ObjectId(object_id)}, {'$set': new_object})
     if result.acknowledged:
