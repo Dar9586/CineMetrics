@@ -57,12 +57,14 @@
                         {% endif %}
                     </tr>
                     {% endfor %}
+                    {% if is_admin %}
                     <tr>
                         <td colspan="2">
                             <button onclick="deleteDocument('{{ col_name }}', '{{ item["_id"] }}')">Delete Document</button>
                             <a href="/update/{{ col_name }}/{{ item["_id"] }}"><button class="updateButton">Update Document</button></a>
                         </td>
                     </tr>
+                    {% endif %}
                 </table>
             </div>
             {% endfor %}

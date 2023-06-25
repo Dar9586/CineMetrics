@@ -22,7 +22,6 @@ admin_db = client["DBFilmAdmin"]
 def list_or_dict(value):
     try:
         value = json.loads(value)
-        print(type(value), isinstance(value, list) or isinstance(value, dict))
         return isinstance(value, list) or isinstance(value, dict)
     except:
         return False
@@ -82,7 +81,8 @@ def create_object():
         return "Error in create"
 
 
-def render_query(collection_name: str, query: Mapping[str, Any], page: int, order_field: str, order_desc: bool):
+def render_query(collection_name: str, query: Mapping[str, Any], page: int, order_field: str, order_desc: bool,
+                 is_admin: bool):
     order_type = pymongo.DESCENDING if order_desc else pymongo.ASCENDING
 
     # Calcola il numero di documenti da saltare in base al numero di pagina e al numero di documenti per pagina
@@ -107,11 +107,21 @@ def render_query(collection_name: str, query: Mapping[str, Any], page: int, orde
 
     # Renderizza il template 'view-data.html' con i dati recuperati
     return render_template('view-data.html', col_name=collection_name, items=good_items, total_page=total_pages,
-                           current_page=page)
+                           current_page=page, is_admin=is_admin)
 
 
+@app.route('/apply-search/admin')
 @app.route('/apply-search')
 def apply_search():
+    is_admin = False
+    if request.path.endswith("admin"):
+        auth = request.authorization
+        if auth and auth.username == 'root' and auth.password == 'root':
+            is_admin = True
+        else:
+            return Response('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
+    print(request.path)
     # Riceve i parametri di ricerca dalla query string
     page = int(request.args.get("page"))
     field_names = request.args.getlist('field_name[]')
@@ -144,7 +154,7 @@ def apply_search():
             query[name] = condition
 
     # Esegue la ricerca e il rendering dei risultati
-    return render_query(table, query, page, order_field, order_desc)
+    return render_query(table, query, page, order_field, order_desc, is_admin)
 
 
 @app.route('/get-fields')
