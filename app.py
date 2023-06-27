@@ -41,6 +41,8 @@ def landing_page():
 
 
 def insert_new_fields(table: str, param: list):
+    param.append("create_time")
+    param.append("last_update")
     admin_db["fields"].update_one(
         {'name': table},
         {'$addToSet': {'declared_fields': {'$each': param}}},
@@ -66,6 +68,7 @@ def create_object():
             pass
         new_object[name] = value
     new_object["create_time"] = datetime.now()
+    new_object["last_update"] = datetime.now()
     # Esempio: Accesso all'oggetto creato dinamicamente
     for name, value in new_object.items():
         print(f"{name}: {value}")
