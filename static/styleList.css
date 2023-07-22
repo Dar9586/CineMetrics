@@ -161,3 +161,23 @@ body.loading .loading-screen {
     visibility: visible;
     transition-delay: 0s;
 }
+
+.list_button {
+    background: #696666;
+    padding: 8px;
+    border-radius: 8px;
+    color: #fff;
+    text-decoration: none;
+    margin: 3px 10px 3px 3px;
+    display: inline-block;
+}
+
+.list_button:hover{
+    background: #3dc374;
+    padding: 8px;
+    border-radius: 8px;
+    color: #fff;
+    text-decoration: none;
+    margin: 3px 10px 3px 3px;
+    display: inline-block;
+}

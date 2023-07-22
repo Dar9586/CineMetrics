@@ -26,6 +26,14 @@ def list_or_dict(value):
     except:
         return False
 
+def get_list_names(value):
+    try:
+        value = json.loads(value)
+        list_names = [genre['name'] for genre in value]
+        return list_names
+    except:
+        return []
+
 
 def increment_view_count(collection, document_id):
     db[collection].update_one(
@@ -95,11 +103,26 @@ def render_query(collection_name: str, query: Mapping[str, Any], page: int, orde
     items = collection.find(query).skip(skip).limit(ITEMS_PER_PAGE).sort(order_field, order_type)
     items = list(items)
     good_items = []
-    for item in items:
-        increment_view_count(collection_name, item["_id"])
-        good_items.append(
-            {key: str(value) if isinstance(value, datetime) or isinstance(value, ObjectId) else (
-                json.dumps(value) if not isinstance(value, str) else value) for key, value in item.items()})
+
+    if collection_name == 'ratings_small':
+        movie_collection = db['movies_metadata']
+
+        for item in items:
+            movie_id = item.get('movieId')
+            if movie_id is not None:
+                movie_query = {'id': movie_id}
+                movie_exists = movie_collection.count_documents(movie_query) > 0
+                if movie_exists:
+                    increment_view_count(collection_name, item["_id"])
+                    good_items.append(
+                        {key: str(value) if isinstance(value, datetime) or isinstance(value, ObjectId) else (
+                            json.dumps(value) if not isinstance(value, str) else value) for key, value in item.items()})
+    else:
+        for item in items:
+            increment_view_count(collection_name, item["_id"])
+            good_items.append(
+                {key: str(value) if isinstance(value, datetime) or isinstance(value, ObjectId) else (
+                    json.dumps(value) if not isinstance(value, str) else value) for key, value in item.items()})
 
     # Conta il numero totale di documenti nella collezione
     total_items = collection.count_documents(query)
@@ -109,7 +132,32 @@ def render_query(collection_name: str, query: Mapping[str, Any], page: int, orde
 
     # Renderizza il template 'view-data.html' con i dati recuperati
     return render_template('view-data.html', col_name=collection_name, items=good_items, total_page=total_pages,
-                           current_page=page, is_admin=is_admin)
+                           current_page=page, is_admin=is_admin, get_list_names=get_list_names)
+
+@app.route('/reviews/<movie_id>')
+def view_histogram(movie_id):
+    
+    ratings_collection = db['ratings_small']
+
+    # Query to retrieve ratings for the specified movie
+    query = {'movieId': int(movie_id)}
+    ratings = ratings_collection.find(query)
+
+    # Initialize a dictionary to store the frequency of each rating value
+    rating_counts = {}
+
+    # Count the frequency of each rating valu
+    for rating in ratings:
+        value = rating['rating']
+        rating_counts[value] = rating_counts.get(value, 0) + 1
+
+    # Create a list of x values (rating values)
+    x_values = [x / 2 for x in range(11)]
+
+    # Create a list of y values (frequency of each rating value)
+    y_values = [rating_counts.get(x, 0) for x in x_values]
+
+    return render_template('reviews.html', movie_id=movie_id, x_values=x_values, y_values=y_values)
 
 
 @app.route('/apply-search/admin')
@@ -123,7 +171,6 @@ def apply_search():
         else:
             return Response('Unauthorized', 401, {'WWW-Authenticate': 'Basic realm="Login Required"'})
 
-    print(request.path)
     # Riceve i parametri di ricerca dalla query string
     page = int(request.args.get("page"))
     field_names = request.args.getlist('field_name[]')
@@ -132,28 +179,34 @@ def apply_search():
     table = request.args.get("table")
     order_field = request.args.get("order-field")
     order_desc = request.args.get("order-desc") == "on"
-    # Crea un nuovo oggetto di query dinamicamente usando i parametri ricevuti dalla query string
-    query = {}
+    looking_for_element_in_list = request.args.get("looking_for_element_in_list") == "1"
 
-    for name, op, value in zip(field_names, field_operation, field_values):
-        if name == "_id":
-            value = ObjectId(value)
-        try:
-            value = json.loads(value)
-        except:
-            pass
+    # Check if custom query should be applied
+    if looking_for_element_in_list:
+        query = {field_names[0]: {"$elemMatch": {"name": field_values[0]}}}
+    else:
+        # Crea un nuovo oggetto di query dinamicamente usando i parametri ricevuti dalla query string
+        query = {}
 
-        if op == "containsIgnoreCase":
-            # Create a case-insensitive regex pattern
-            pattern = re.compile(re.escape(value), re.IGNORECASE)
-            condition = {"$regex": pattern}
-        else:
-            condition = {op: value}
+        for name, op, value in zip(field_names, field_operation, field_values):
+            if name == "_id":
+                value = ObjectId(value)
+            try:
+                value = json.loads(value)
+            except:
+                pass
 
-        if name in query:
-            query[name][op] = value
-        else:
-            query[name] = condition
+            if op == "containsIgnoreCase":
+                # Create a case-insensitive regex pattern
+                pattern = re.compile(re.escape(value), re.IGNORECASE)
+                condition = {"$regex": pattern}
+            else:
+                condition = {op: value}
+
+            if name in query:
+                query[name][op] = value
+            else:
+                query[name] = condition
 
     # Esegue la ricerca e il rendering dei risultati
     return render_query(table, query, page, order_field, order_desc, is_admin)

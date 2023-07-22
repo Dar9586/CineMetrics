@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Istogramma Valutazioni</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <link href="/static/jsmaps/jsmaps.css" rel="stylesheet" type="text/css"/>
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" type="text/css">
+</head>
+<body>
+    <div class="navbar">
+        <a href="/">Home</a>
+        <a href="/add-document">Add document</a>
+        <a href="/search" class="active">Search</a>
+        <a href="/statistics">Statistics</a>
+    </div>
+    <h1>Reviews</h1>
+    <div id="histogram"></div>
+
+    <script>
+        // Crea un istogramma utilizzando Plotly.js
+        var xValues = {{ x_values|safe }};
+        var yValues = {{ y_values|safe }};
+
+        var data = [
+            {
+                x: xValues,
+                y: yValues,
+                type: 'bar'
+            }
+        ];
+
+        var layout = {
+            title: 'Istogramma Valutazioni',
+            xaxis: {
+                title: 'Valutazione',
+                tickmode: 'linear',
+                tickvals: xValues,
+                ticktext: xValues.map(String)
+            },
+            yaxis: {
+                title: 'Numero di Valutazioni'
+            }
+        };
+
+        Plotly.newPlot('histogram', data, layout);
+    </script>
+</body>
+</html>

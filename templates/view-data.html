@@ -48,14 +48,55 @@
                         <th>{{ key }}</th>
                         {% if value is list_or_dict %}
                         <td>
-                            <code class="prettyprint lang-json">{{ value }}</code>
-                            <pre class="prettyprint lang-json" hidden></pre>
+                            {% set names = get_list_names(value) %}
+                            {% for name in names %}
+                            <form action="{{ url_for('apply_search') }}" method="GET">
+                                <input type="hidden" name="field_name[]" value="{{ key }}">
+                                <input type="hidden" name="field_value[]" value="{{ name }}">
+                                <input type="hidden" name="page" value="1">
+                                <input type="hidden" name="looking_for_element_in_list" value="1">
+                                <input type="hidden" name="table" value="{{col_name}}">
+                                <input type="hidden" name="order-field" value="_id">
+                                <button type="submit" class="list_button">{{ name }}</button>
+                            </form>
+                            {% endfor %}
                         </td>
-
-                        {%else%}
+                        {% elif key=="movieId" %}
+                        <td>
+                            <form action="{{ url_for('apply_search') }}" method="GET">
+                                <input type="hidden" name="field_name[]" value="id">
+                                <input type="hidden" name="field_value[]" value="{{ value }}">
+                                <input type="hidden" name="field_operation[]" value="$eq">
+                                <input type="hidden" name="page" value="1">
+                                <input type="hidden" name="looking_for_element_in_list" value="0">
+                                <input type="hidden" name="table" value="movies_metadata">
+                                <input type="hidden" name="order-field" value="_id">
+                                <button type="submit" class="list_button">{{ value }}</button>
+                            </form>                         
+                        </td>
+                        {% elif key=="userId" %}
+                        <td>
+                            <form action="{{ url_for('apply_search') }}" method="GET">
+                                <input type="hidden" name="field_name[]" value="userId">
+                                <input type="hidden" name="field_value[]" value="{{ value }}">
+                                <input type="hidden" name="field_operation[]" value="$eq">
+                                <input type="hidden" name="page" value="1">
+                                <input type="hidden" name="looking_for_element_in_list" value="0">
+                                <input type="hidden" name="table" value="ratings_small">
+                                <input type="hidden" name="order-field" value="_id">
+                                <button type="submit" class="list_button">{{ value }}</button>
+                            </form>              
+                        </td>
+                        {% elif key=="vote_average" %}
+                        <td>
+                            <a class="list_button" href="{{ url_for('view_histogram', movie_id=item['id']) }}">
+                                {{ value }}
+                            </a>                            
+                        </td>
+                        {% else %}
                         <td>{{ value }}</td>
                         {% endif %}
-                    </tr>
+                    </tr>                    
                     {% endfor %}
                     <tr>
                         <td colspan="2">
