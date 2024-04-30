@@ -11,7 +11,10 @@ L'applicazione web consente di eseguire le seguenti operazioni CRUD sul dataset 
 - **Read**: Visualizzare i dettagli dei film presenti nel dataset.
 - **Update**: Modificare le informazioni dei film esistenti.
 - **Delete**: Rimuovere film dal dataset.
+
 ![Film Dataset](./img/image3.png)
+
+
 ## Visualizzazione dei Film con Oltre 5 Stelle o Determinati Attributi
 L'applicazione offre la possibilità di visualizzare i film che soddisfano determinati criteri, tra cui:
 - **Film con oltre 5 stelle**: Mostra i film che hanno ricevuto una valutazione media superiore a 5 stelle.
