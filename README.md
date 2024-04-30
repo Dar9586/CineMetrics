@@ -25,12 +25,12 @@ Questa funzionalità consente agli utenti di identificare facilmente i film di a
 
 ## Statistiche
 Le statistiche generate dall'applicazione includono:
-- I tre film più visitati in ogni regione, utili per comprendere le preferenze del pubblico in diverse aree geografiche.
+- I tre film più visitati in ogni paese, utili per comprendere le preferenze del pubblico in diverse aree geografiche.
 ![Film Dataset](./img/image2.png)
 ## Tecnologie Utilizzate
 - Linguaggio di Programmazione: [Inserire il linguaggio di programmazione utilizzato, ad esempio Python]
 - Framework Web: [Inserire il framework web utilizzato, ad esempio Flask]
-- Database: [Inserire il database utilizzato, ad esempio SQLite]
+- Database: [Inserire il database utilizzato, NoSQL(Data base non relazionale)]
 
 ## Istruzioni per l'Installazione e l'Esecuzione
 1. Clonare questo repository sul tuo sistema locale.
@@ -39,5 +39,5 @@ Le statistiche generate dall'applicazione includono:
 4. Accedere all'applicazione tramite il browser web utilizzando l'URL specificato nelle istruzioni dell'applicazione.
 
 ## Crediti
-Questo progetto è stato realizzato da [Inserire il tuo nome] come parte del corso di Basi di Dati 2 presso [Inserire il nome dell'istituzione] con la guida del Prof. Genoeff Tortora.
+Questo progetto è stato realizzato da [Luigi Emanuele Sica, Antonio Toppi e Luigi Allocca] come parte del corso di Basi di Dati 2 presso [L'università degli stud di Salerno] con la guida del Prof. Genoeff Tortora.
 
